@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Answer, Crossword } from "@/types/crossword";
 import {
   Flex,
@@ -26,14 +26,15 @@ import { Delete, Download, Home, Plus, Printer } from "lucide-react";
 import { CrosswordVisualization } from "@/components/preview/crosswordvisualization";
 import updateCrosswordLocalStorage from "@/lib/pages/editor/utils/updateCrosswordLocalStorage";
 import * as htmlToImage from "html-to-image";
-import { toPng, toJpeg, toSvg } from "html-to-image";
 
 interface EditorProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export const Editor = ({ params }: EditorProps) => {
   const router = useRouter();
+
+  const { id } = use(params); 
 
   const [crossword, setCrossword] = useState<Crossword | null>(null);
   const [imgFormat, setImgFormat] = useState("png");
@@ -130,7 +131,7 @@ export const Editor = ({ params }: EditorProps) => {
 
     try {
       const crosswords: Crossword[] = JSON.parse(stored);
-      const found = crosswords.find((cw) => cw.id === params.id);
+      const found = crosswords.find((cw) => cw.id === id);
 
       if (!found) return router.replace("/");
 
@@ -139,7 +140,7 @@ export const Editor = ({ params }: EditorProps) => {
       console.error("Error loading crossword:", err);
       router.replace("/");
     }
-  }, [params.id, router]);
+  }, [id, router]);
 
   // Funkcje do manipulacji odpowiedziami
   const updateAnswers = (index: number, question: string) => {
