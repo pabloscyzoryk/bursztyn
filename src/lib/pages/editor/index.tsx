@@ -37,7 +37,7 @@ export const Editor = ({ params }: EditorProps) => {
   const { id } = use(params); 
 
   const [crossword, setCrossword] = useState<Crossword | null>(null);
-  const [imgFormat, setImgFormat] = useState("png");
+  const [imgFormat, setImgFormat] = useState(["png"]);
 
   const setTitle = (title: string) => {
     if (crossword) {
@@ -188,13 +188,14 @@ export const Editor = ({ params }: EditorProps) => {
       return;
     }
 
-    switch (imgFormat) {
+    switch (imgFormat[0]) {
       case "png": {
         const dataUrl = await htmlToImage.toPng(node, { quality: 1 });
         const link = document.createElement("a");
         link.download = `${crossword!.title}`;
         link.href = dataUrl;
         link.click();
+        break;
       }
       case "jpeg": {
         const dataUrl = await htmlToImage.toJpeg(node, { quality: 1 });
@@ -202,6 +203,7 @@ export const Editor = ({ params }: EditorProps) => {
         link.download = `${crossword!.title}`;
         link.href = dataUrl;
         link.click();
+        break;
       }
       case "svg": {
         const dataUrl = await htmlToImage.toSvg(node, { quality: 1 });
@@ -209,8 +211,15 @@ export const Editor = ({ params }: EditorProps) => {
         link.download = `${crossword!.title}`;
         link.href = dataUrl;
         link.click();
+        break;
       }
       default: {
+        const dataUrl = await htmlToImage.toPng(node, { quality: 1 });
+        const link = document.createElement("a");
+        link.download = `${crossword!.title}`;
+        link.href = dataUrl;
+        link.click();
+        break;
       }
     }
   };
@@ -637,8 +646,8 @@ export const Editor = ({ params }: EditorProps) => {
                 collection={formats}
                 size="sm"
                 width={20}
-                onValueChange={(e) => setImgFormat(e.value[0])}
-                value={[imgFormat]}
+                onValueChange={(e) => setImgFormat(e.value)}
+                value={imgFormat}
               >
                 <Select.HiddenSelect />
                 <Select.Control>
