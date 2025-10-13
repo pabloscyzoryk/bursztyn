@@ -30,25 +30,29 @@ export const CrosswordVisualization = ({
   shouldShowQuestions,
   size,
 }: CrosswordVisualizationProps) => {
-  const finalArr = answers.map((answer, i) => {
-    const wordLetters = answer.word.split("");
-    const solutionLetter = solution[i];
+    const finalArr = answers.map((answer, i) => {
+    const wordLetters = (answer.word || "").split("");
+    const solutionLetter = solution[i] ?? "";
 
     const matchingIndexes = wordLetters
-      .map((letter, index) => (letter === solutionLetter ? index : -1))
+      .map((letter, index) =>
+        letter.toUpperCase() === (solutionLetter || "").toUpperCase() ? index : -1
+      )
       .filter((index) => index !== -1);
-
-    const selectedIndex = matchingIndexes[answer.shift];
+    const safeShift = typeof answer.shift === "number" && answer.shift >= 0 ? answer.shift : 0;
+    const selectedIndex =
+      matchingIndexes.length > 0 ? matchingIndexes[Math.min(safeShift, matchingIndexes.length - 1)] : -1;
 
     return {
-      left: wordLetters.slice(0, selectedIndex),
-      right: wordLetters.slice(selectedIndex + 1),
+      left: selectedIndex === -1 ? wordLetters : wordLetters.slice(0, selectedIndex),
+      right: selectedIndex === -1 ? [] : wordLetters.slice(selectedIndex + 1),
       solutionLetter,
       question: answer.question,
       wordArr: wordLetters,
       selectedIndex,
     };
   });
+
 
   const maxLeftLength = Math.max(
     ...finalArr.map((answer) => answer.left.length)
