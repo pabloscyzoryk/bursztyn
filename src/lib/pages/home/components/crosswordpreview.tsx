@@ -1,7 +1,7 @@
 // imports
 
 // chakra-ui
-import { Text, Box, Flex, VStack, Center } from "@chakra-ui/react";
+import { Text, VStack, Center } from "@chakra-ui/react";
 import { Button } from "@/components/ui/button";
 import { FC } from "react";
 import { Crossword } from "@/types/crossword";

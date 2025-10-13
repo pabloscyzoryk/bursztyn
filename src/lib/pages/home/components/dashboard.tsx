@@ -57,13 +57,11 @@ export const Dashboard = () => {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, [isClient]);
 
-  // Filtrowanie krzyżówek według wyszukiwania
   const filteredCrosswords = crosswords.filter((crossword) => {
     if (!searchQuery.trim()) return true;
 
     const query = searchQuery.toLowerCase();
     
-    // Sprawdzanie w kolejności: title, solution, answers.word, answers.question
     return (
       crossword.title?.toLowerCase().includes(query) ||
       crossword.solution?.toLowerCase().includes(query) ||
@@ -74,11 +72,10 @@ export const Dashboard = () => {
     );
   });
 
-  // Sortowanie krzyżówek według lastModifiedAt - od najnowszych do najstarszych
   const sortedCrosswords = [...filteredCrosswords].sort((a, b) => {
     const dateA = new Date(a.lastModifiedAt || 0).getTime();
     const dateB = new Date(b.lastModifiedAt || 0).getTime();
-    return dateB - dateA; // sortowanie malejąco - najnowsze pierwsze
+    return dateB - dateA;
   });
 
   if (!isClient) {
@@ -98,6 +95,7 @@ export const Dashboard = () => {
       minH="50vh"
       minW="100vw"
       mt={2}
+      mb="100px"
     >
       <InputGroup
         mb={6}
@@ -168,7 +166,6 @@ export const Dashboard = () => {
             </GridItem>
           ))
         ) : (
-          // Wyświetlanie komunikatu gdy nie znaleziono krzyżówek
           <GridItem colSpan={3}>
             <Center w="100%" py={10}>
               <Text fontSize="lg" color="gray.500">
