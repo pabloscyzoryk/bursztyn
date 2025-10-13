@@ -164,7 +164,7 @@ export const Footer = () => {
                       placeholder="Moja wiadomość / opinia / błąd..."
                       flex="1"
                       fontSize={16}
-                      resize="both"
+                      resize="none"
                       minH={200}
                       name='message'
                       value={message}
