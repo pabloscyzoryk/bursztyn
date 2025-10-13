@@ -116,6 +116,34 @@ export const Dashboard = () => {
         templateColumns="repeat(auto-fit, minmax(400px, 1fr))"
         gap={25}
       >
+                <GridItem margin={25}>
+          <Center
+            w={400}
+            h={450}
+            bgColor="gray.300"
+            borderRadius="20px"
+            onClick={() => createNewCrossword(router)}
+            cursor="pointer"
+            _hover={{ transform: "scale(1.02)", transition: "transform 0.2s" }}
+          >
+            <VStack
+              borderRadius={16}
+              cursor="pointer"
+              px={8}
+              py={12}
+              bg="teal.600"
+              _hover={{ bg: "teal.500" }}
+              transitionDuration="fast"
+            >
+              <Center>
+                <Icon color="white">
+                  <Plus />
+                </Icon>
+              </Center>
+              <Text color="white">Utwórz nową</Text>
+            </VStack>
+          </Center>
+        </GridItem>
         {sortedCrosswords.length > 0 ? (
           sortedCrosswords.map((c) => (
             <GridItem className="group" w={400} margin={25} key={c.id}>
@@ -176,35 +204,6 @@ export const Dashboard = () => {
             </Center>
           </GridItem>
         )}
-
-        <GridItem margin={25}>
-          <Center
-            w={400}
-            h={450}
-            bgColor="gray.300"
-            borderRadius="20px"
-            onClick={() => createNewCrossword(router)}
-            cursor="pointer"
-            _hover={{ transform: "scale(1.02)", transition: "transform 0.2s" }}
-          >
-            <VStack
-              borderRadius={16}
-              cursor="pointer"
-              px={8}
-              py={12}
-              bg="teal.600"
-              _hover={{ bg: "teal.500" }}
-              transitionDuration="fast"
-            >
-              <Center>
-                <Icon color="white">
-                  <Plus />
-                </Icon>
-              </Center>
-              <Text color="white">Utwórz nową</Text>
-            </VStack>
-          </Center>
-        </GridItem>
       </Grid>
     </Flex>
   );
