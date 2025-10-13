@@ -21,8 +21,10 @@ import {
   Checkbox,
   Select,
   createListCollection,
+  Dialog,
+  CloseButton,
 } from "@chakra-ui/react";
-import { Delete, Download, Home, Plus, Printer } from "lucide-react";
+import { Delete, Download, Home, Plus, Printer, Trash2 } from "lucide-react";
 import { CrosswordVisualization } from "@/components/preview/crosswordvisualization";
 import updateCrosswordLocalStorage from "@/lib/pages/editor/utils/updateCrosswordLocalStorage";
 import * as htmlToImage from "html-to-image";
@@ -34,7 +36,7 @@ interface EditorProps {
 export const Editor = ({ params }: EditorProps) => {
   const router = useRouter();
 
-  const { id } = use(params); 
+  const { id } = use(params);
 
   const [crossword, setCrossword] = useState<Crossword | null>(null);
   const [imgFormat, setImgFormat] = useState(["png"]);
@@ -181,6 +183,20 @@ export const Editor = ({ params }: EditorProps) => {
     setAnswers(filtered);
   };
 
+  const handleDeleteProject = () => {
+    const crosswordsLC = localStorage.getItem("crosswords");
+
+    if (!crosswordsLC || !crossword) {
+      return;
+    }
+
+    const parsed: Crossword[] = JSON.parse(crosswordsLC);
+    const filtered = parsed.filter((cw: Crossword) => cw.id !== crossword.id);
+    localStorage.setItem("crosswords", JSON.stringify(filtered));
+
+    router.replace("/");
+  };
+
   const handleDownload = async () => {
     const node = document.getElementById("crossword-canvas");
 
@@ -198,7 +214,9 @@ export const Editor = ({ params }: EditorProps) => {
         break;
       }
       case "jpeg": {
-        const dataUrl = await htmlToImage.toJpeg(node, { quality: 1 });
+        const element = node;
+        element.style.backgroundColor = "white";
+        const dataUrl = await htmlToImage.toJpeg(element, { quality: 1 });
         const link = document.createElement("a");
         link.download = `${crossword!.title}`;
         link.href = dataUrl;
@@ -678,6 +696,51 @@ export const Editor = ({ params }: EditorProps) => {
                 <Printer />
               </Icon>
             </Button>
+            <Dialog.Root motionPreset="slide-in-bottom">
+              <Dialog.Trigger asChild>
+                <Button colorPalette="red">
+                  Usuń ten projekt krzyżówki
+                  <Icon>
+                    <Trash2 />
+                  </Icon>
+                </Button>
+              </Dialog.Trigger>
+              <Portal>
+                <Dialog.Backdrop />
+                <Dialog.Positioner>
+                  <Dialog.Content>
+                    <Dialog.Header>
+                      <Dialog.Title>
+                        Czy na pewno usunąć krzyżówkę {crossword.title}?
+                      </Dialog.Title>
+                    </Dialog.Header>
+                    <Dialog.Body>
+                      <p>
+                        Wszyskie dane tego projektu zostaną utracone, bez
+                        możliwości odzyskania. Upewnij się, że ten projekt nie
+                        jest Ci już potrzebny lub posiadasz kopię zapasową. Po
+                        usunięciu zostaniesz przeniesiony na stronę główną
+                        aplikacji Bursztyn.
+                      </p>
+                    </Dialog.Body>
+                    <Dialog.Footer>
+                      <Dialog.ActionTrigger asChild>
+                        <Button variant="outline">Anuluj</Button>
+                      </Dialog.ActionTrigger>
+                      <Button
+                        onClick={() => handleDeleteProject()}
+                        colorPalette="red"
+                      >
+                        Usuń
+                      </Button>
+                    </Dialog.Footer>
+                    <Dialog.CloseTrigger asChild>
+                      <CloseButton size="sm" />
+                    </Dialog.CloseTrigger>
+                  </Dialog.Content>
+                </Dialog.Positioner>
+              </Portal>
+            </Dialog.Root>
           </Flex>
         </Flex>
       </VStack>
