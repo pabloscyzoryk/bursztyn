@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@chakra-ui/react": "^3.25.0",
+    "@emailjs/browser": "^4.4.1",
     "@emotion/react": "^11.14.0",
     "commit-and-tag-version": "^12.5.2",
     "html-to-image": "^1.11.13",
