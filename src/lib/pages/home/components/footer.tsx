@@ -5,8 +5,6 @@ import {
   Text,
   Box,
   Flex,
-  VStack,
-  Center,
   Icon,
   Portal,
   Dialog,

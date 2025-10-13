@@ -542,7 +542,7 @@ export const Editor = ({ params }: EditorProps) => {
 
       <VStack maxW={1000} minW={1000}>
         <Flex id="crossword-canvas" minH={440} alignItems="center" direction="column">
-          <Text id="crossword-title-canvas" fontWeight={500} mt={6} maxH={16}>
+          <Text h={4} display='inline-block' id="crossword-title-canvas" fontWeight={500} mt={6} maxH={16}>
             {crossword.title}
           </Text>
 
