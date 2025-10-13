@@ -114,7 +114,7 @@ export const Dashboard = () => {
       </InputGroup>
 
       <Grid
-        w="90%"
+        maxW="90%"
         templateColumns="repeat(auto-fit, minmax(400px, 1fr))"
         gap={25}
       >
