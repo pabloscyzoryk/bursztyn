@@ -1,5 +1,5 @@
 import { Answer } from "@/types/crossword";
-import { Flex, List } from "@chakra-ui/react";
+import { Flex, List, Text } from "@chakra-ui/react";
 
 interface CrosswordVisualizationProps {
   solution: string;
@@ -30,21 +30,29 @@ export const CrosswordVisualization = ({
   shouldShowQuestions,
   size,
 }: CrosswordVisualizationProps) => {
-    const finalArr = answers.map((answer, i) => {
+  const finalArr = answers.map((answer, i) => {
     const wordLetters = (answer.word || "").split("");
     const solutionLetter = solution[i] ?? "";
 
     const matchingIndexes = wordLetters
       .map((letter, index) =>
-        letter.toUpperCase() === (solutionLetter || "").toUpperCase() ? index : -1
+        letter.toUpperCase() === (solutionLetter || "").toUpperCase()
+          ? index
+          : -1
       )
       .filter((index) => index !== -1);
-    const safeShift = typeof answer.shift === "number" && answer.shift >= 0 ? answer.shift : 0;
+    const safeShift =
+      typeof answer.shift === "number" && answer.shift >= 0 ? answer.shift : 0;
     const selectedIndex =
-      matchingIndexes.length > 0 ? matchingIndexes[Math.min(safeShift, matchingIndexes.length - 1)] : -1;
+      matchingIndexes.length > 0
+        ? matchingIndexes[Math.min(safeShift, matchingIndexes.length - 1)]
+        : -1;
 
     return {
-      left: selectedIndex === -1 ? wordLetters : wordLetters.slice(0, selectedIndex),
+      left:
+        selectedIndex === -1
+          ? wordLetters
+          : wordLetters.slice(0, selectedIndex),
       right: selectedIndex === -1 ? [] : wordLetters.slice(selectedIndex + 1),
       solutionLetter,
       question: answer.question,
@@ -52,7 +60,6 @@ export const CrosswordVisualization = ({
       selectedIndex,
     };
   });
-
 
   const maxLeftLength = Math.max(
     ...finalArr.map((answer) => answer.left.length)
@@ -90,43 +97,31 @@ export const CrosswordVisualization = ({
 
   return (
     <Flex
-      justifyContent="flex-start"
-      alignItems="flex-start"
-      minW="700px"
-      maxW="1000px"
+      justifyContent="center"
+      alignItems="center"
       padding={4}
       w="auto"
-      h="440px"
-      maxH="440px"
-      minH="440px"
-      overflowX="auto"
-      overflowY="auto"
+      h="auto"
       flex="1"
       gap={6}
-      css={{
-        "&::-webkit-scrollbar": {
-          height: "8px",
-          width: "8px",
-        },
-        "&::-webkit-scrollbar-track": {
-          background: "#f1f1f1",
-        },
-        "&::-webkit-scrollbar-thumb": {
-          background: "#c1c1c1",
-          borderRadius: "4px",
-        },
-      }}
     >
       {shouldShowQuestions && (
-        <List.Root ml={6} as="ol" flexShrink={0}>
+        <List.Root
+          minW="300px" 
+          ml={6}
+          as="ol"
+          h="100%"
+          overflowY="auto"
+          flexShrink={0}
+        >
           {answers.map((answer, index) => (
-            <List.Item key={index} maxW="300px">
+            <Text as="li" key={index} maxW="300px" mb={1} lineHeight="1.2"> 
               {answer.question}
-            </List.Item>
+            </Text>
           ))}
         </List.Root>
       )}
-      <Flex w="100%" justifyContent="center" gap={4}>
+      <Flex w="auto" h='auto' justifyContent="center" gap={4} flexShrink={0}>
         <table
           style={{
             borderCollapse: "collapse",
@@ -160,7 +155,9 @@ export const CrosswordVisualization = ({
                   </td>
                 ))}
 
-                <td style={solutionCellStyle}>{shouldShowAnswers ? answer.solutionLetter : ""}</td>
+                <td style={solutionCellStyle}>
+                  {shouldShowAnswers ? answer.solutionLetter : ""}
+                </td>
 
                 {answer.right.map((rightLetter, index) => (
                   <td key={`right-${index}`} style={answerCellStyle}>

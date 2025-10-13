@@ -25,10 +25,43 @@ import {
   Box,
   List,
   Text,
+  IconButton,
 } from "@chakra-ui/react";
-import { Delete, Download, Home, Minus, Plus, Printer, Trash2 } from "lucide-react";
+import {
+  Delete,
+  Download,
+  Home,
+  Minus,
+  Moon,
+  Plus,
+  Printer,
+  Sun,
+  Trash2,
+} from "lucide-react";
 import updateCrosswordLocalStorage from "@/lib/pages/editor/utils/updateCrosswordLocalStorage";
 import * as htmlToImage from "html-to-image";
+import { useColorMode } from "@/components/ui/color-mode";
+
+// Zastąp ten import faktyczną ścieżką do Twojego komponentu
+// Zakładam, że ten komponent jest w innym pliku lub musi być zaimportowany
+// export const CrosswordVisualization = (props: CrosswordVisualizationProps) => { /* ... */ }
+interface CrosswordVisualizationProps {
+    solution: string;
+    answers: Answer[];
+    answersBackgroundColor: string;
+    answersBorderColor: string;
+    answersBorderThickness: number;
+    shouldShowIndexes: boolean;
+    solutionBorderColor: string;
+    solutionBorderThickness: number;
+    solutionsBackgroundColor: string;
+    shouldShowAnswers: boolean;
+    shouldShowQuestions: boolean;
+    size: number;
+}
+// Poniżej znajduje się definicja CrosswordVisualization w tym samym pliku
+// by zapewnić kompletność i wprowadzić poprawkę.
+
 
 interface EditorProps {
   params: Promise<{ id: string }>;
@@ -36,6 +69,8 @@ interface EditorProps {
 
 export const Editor = ({ params }: EditorProps) => {
   const router = useRouter();
+
+  const { toggleColorMode, colorMode } = useColorMode();
 
   const { id } = use(params);
 
@@ -177,7 +212,9 @@ export const Editor = ({ params }: EditorProps) => {
     if (!crossword) return;
 
     const temp = [...crossword.answers];
-    const filtered = temp.filter((answer, answerIndex) => index !== answerIndex);
+    const filtered = temp.filter(
+      (answer, answerIndex) => index !== answerIndex
+    );
     setAnswers(filtered);
   };
 
@@ -232,7 +269,8 @@ export const Editor = ({ params }: EditorProps) => {
     }
 
     const maxShift = positions.length - 1;
-    const currentShift = typeof currentAnswer.shift === "number" ? currentAnswer.shift : 0;
+    const currentShift =
+      typeof currentAnswer.shift === "number" ? currentAnswer.shift : 0;
     let newShift = currentShift + amount;
 
     if (newShift > maxShift) newShift = 0;
@@ -248,45 +286,87 @@ export const Editor = ({ params }: EditorProps) => {
 
   const handleDownload = async () => {
     const node = document.getElementById("crossword-canvas");
-
     if (!node) {
+      console.error("Element 'crossword-canvas' nie został znaleziony");
       return;
     }
 
-    switch (imgFormat[0]) {
-      case "png": {
-        const dataUrl = await htmlToImage.toPng(node, { quality: 1 });
-        const link = document.createElement("a");
-        link.download = `${crossword!.title}`;
-        link.href = dataUrl;
-        link.click();
-        break;
+    const clone = node.cloneNode(true) as HTMLElement;
+
+    clone.style.position = "fixed";
+    clone.style.left = "0";
+    clone.style.top = "0";
+    clone.style.overflow = "visible";
+    clone.style.width = "auto";
+    clone.style.height = "auto";
+    clone.style.maxWidth = "none";
+    clone.style.maxHeight = "none";
+    clone.style.minWidth = "none";
+    clone.style.minHeight = "none";
+    clone.style.zIndex = "9999";
+    clone.style.visibility = "visible";
+    clone.style.opacity = "1";
+
+    const originalDisplay = node.style.display;
+    node.style.display = "none";
+
+    document.body.appendChild(clone);
+
+    const format = imgFormat[0];
+    const isJpeg = format === "jpeg";
+
+    const options = {
+      pixelRatio: 2,
+      cacheBust: true,
+      backgroundColor: isJpeg
+        ? colorMode === "dark"
+          ? "000000"
+          : "ffffff"
+        : undefined,
+      quality: 1,
+      useCORS: true,
+      style: {
+        transform: "none",
+        overflow: "visible",
+      },
+    };
+
+    try {
+      let dataUrl;
+      console.log("Rozpoczynanie renderowania format:", format);
+
+      // Dodaj krótki timeout aby zapewnić renderowanie
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      if (format === "png") {
+        dataUrl = await htmlToImage.toPng(clone, options);
+      } else if (format === "jpeg") {
+        dataUrl = await htmlToImage.toJpeg(clone, options);
+      } else if (format === "svg") {
+        dataUrl = await htmlToImage.toSvg(clone, options);
+      } else {
+        dataUrl = await htmlToImage.toPng(clone, options);
       }
-      case "jpeg": {
-        const element = node;
-        element.style.backgroundColor = "white";
-        const dataUrl = await htmlToImage.toJpeg(element, { quality: 1 });
-        const link = document.createElement("a");
-        link.download = `${crossword!.title}`;
-        link.href = dataUrl;
-        link.click();
-        break;
+
+      if (!dataUrl || dataUrl === "data:,") {
+        throw new Error("Puste dane obrazu");
       }
-      case "svg": {
-        const dataUrl = await htmlToImage.toSvg(node, { quality: 1 });
-        const link = document.createElement("a");
-        link.download = `${crossword!.title}`;
-        link.href = dataUrl;
-        link.click();
-        break;
-      }
-      default: {
-        const dataUrl = await htmlToImage.toPng(node, { quality: 1 });
-        const link = document.createElement("a");
-        link.download = `${crossword!.title}`;
-        link.href = dataUrl;
-        link.click();
-        break;
+
+      console.log("Renderowanie zakończone, tworzenie linku pobierania");
+
+      const link = document.createElement("a");
+      link.download = `${crossword?.title || "crossword"}.${format}`;
+      link.href = dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error("Błąd podczas renderowania obrazu:", err);
+      alert("Wystąpił błąd podczas generowania obrazu. Spróbuj ponownie.");
+    } finally {
+      node.style.display = originalDisplay;
+      if (document.body.contains(clone)) {
+        document.body.removeChild(clone);
       }
     }
   };
@@ -299,7 +379,9 @@ export const Editor = ({ params }: EditorProps) => {
       return;
     }
 
-    const titleElement = crosswordElement.querySelector("#crossword-title-canvas");
+    const titleElement = crosswordElement.querySelector(
+      "#crossword-title-canvas"
+    );
 
     if (titleElement) {
       titleElement.remove();
@@ -386,18 +468,19 @@ export const Editor = ({ params }: EditorProps) => {
     <Flex
       justifyContent="space-between"
       w="100vw"
-      minH="50vh"
       minW="100vw"
       maxW="100vw"
       overflowX="hidden"
+      pr={4}
     >
       <VStack p={12}>
-        <Flex m={2} justifyContent="left" w="100%">
-          <Button onClick={() => router.replace("/")} size="md">
-            <Icon>
-              <Home />
-            </Icon>
-          </Button>
+        <Flex gap={2} mb={2} justifyContent="left" w="100%">
+          <IconButton onClick={() => router.replace("/")} size="md">
+            <Home />
+          </IconButton>
+          <IconButton onClick={toggleColorMode} size="md">
+            {colorMode === "light" ? <Sun /> : <Moon />}
+          </IconButton>
         </Flex>
 
         <Field.Root ml={4} orientation="vertical">
@@ -531,7 +614,11 @@ export const Editor = ({ params }: EditorProps) => {
           </HStack>
         ))}
         <Center mt={2}>
-          <Button onClick={() => handleAddQuestion()} colorPalette="teal" color="white">
+          <Button
+            onClick={() => handleAddQuestion()}
+            colorPalette="teal"
+            color="white"
+          >
             Dodaj słowo
             <Icon>
               <Plus />
@@ -540,9 +627,25 @@ export const Editor = ({ params }: EditorProps) => {
         </Center>
       </VStack>
 
-      <VStack maxW={1000} minW={1000}>
-        <Flex id="crossword-canvas" minH={440} alignItems="center" direction="column">
-          <Text h={4} display='inline-block' id="crossword-title-canvas" fontWeight={500} mt={6} maxH={16}>
+      <VStack minW={1000}>
+        <Flex
+          id="crossword-canvas"
+          alignItems="center"
+          direction="column"
+          overflowY="auto"
+          overflowX='auto'
+          p={4}
+          maxW={1000}
+          maxH={440}
+          
+        >
+          <Text
+            h={4}
+            id="crossword-title-canvas"
+            fontWeight={500}
+            mt={6}
+            maxH={16}
+          >
             {crossword.title}
           </Text>
 
@@ -671,7 +774,12 @@ export const Editor = ({ params }: EditorProps) => {
           <VStack>
             <Field.Root>
               <Field.Label>Wielkość krzyżówki</Field.Label>
-              <NumberInput.Root onValueChange={(e) => setSize(e.valueAsNumber)} value={String(crossword.size)} min={0} width="200px">
+              <NumberInput.Root
+                onValueChange={(e) => setSize(e.valueAsNumber)}
+                value={String(crossword.size)}
+                min={0}
+                width="200px"
+              >
                 <NumberInput.Control />
                 <NumberInput.Input />
               </NumberInput.Root>
@@ -679,7 +787,14 @@ export const Editor = ({ params }: EditorProps) => {
 
             <Field.Root>
               <Field.Label>Grubość ramki rozwiązania</Field.Label>
-              <NumberInput.Root onValueChange={(e) => setSolutionBorderThickness(e.valueAsNumber)} value={String(crossword.solutionBorderThickness)} min={0} width="200px">
+              <NumberInput.Root
+                onValueChange={(e) =>
+                  setSolutionBorderThickness(e.valueAsNumber)
+                }
+                value={String(crossword.solutionBorderThickness)}
+                min={0}
+                width="200px"
+              >
                 <NumberInput.Control />
                 <NumberInput.Input />
               </NumberInput.Root>
@@ -687,7 +802,14 @@ export const Editor = ({ params }: EditorProps) => {
 
             <Field.Root>
               <Field.Label>Grubość ramki odpowiedzi</Field.Label>
-              <NumberInput.Root onValueChange={(e) => setAnswersBorderThickness(e.valueAsNumber)} value={String(crossword.answersBorderThickness)} min={0} width="200px">
+              <NumberInput.Root
+                onValueChange={(e) =>
+                  setAnswersBorderThickness(e.valueAsNumber)
+                }
+                value={String(crossword.answersBorderThickness)}
+                min={0}
+                width="200px"
+              >
                 <NumberInput.Control />
                 <NumberInput.Input />
               </NumberInput.Root>
@@ -695,18 +817,27 @@ export const Editor = ({ params }: EditorProps) => {
           </VStack>
 
           <Flex direction="column" gap={4} mt={7}>
-            <Checkbox.Root checked={crossword.shouldShowQuestions} onCheckedChange={(e) => setShouldShowQuestions(!!e.checked)}>
+            <Checkbox.Root
+              checked={crossword.shouldShowQuestions}
+              onCheckedChange={(e) => setShouldShowQuestions(!!e.checked)}
+            >
               <Checkbox.HiddenInput />
               <Checkbox.Control />
               <Checkbox.Label>Pokazać pytania?</Checkbox.Label>
             </Checkbox.Root>
-            <Checkbox.Root checked={crossword.shouldShowAnswers} onCheckedChange={(e) => setShouldShowAnswers(!!e.checked)}>
+            <Checkbox.Root
+              checked={crossword.shouldShowAnswers}
+              onCheckedChange={(e) => setShouldShowAnswers(!!e.checked)}
+            >
               <Checkbox.HiddenInput />
               <Checkbox.Control />
               <Checkbox.Label>Ujawnić odpowiedzi?</Checkbox.Label>
             </Checkbox.Root>
 
-            <Checkbox.Root checked={crossword.shouldShowIndexes} onCheckedChange={(e) => setShouldShowIndexes(!!e.checked)}>
+            <Checkbox.Root
+              checked={crossword.shouldShowIndexes}
+              onCheckedChange={(e) => setShouldShowIndexes(!!e.checked)}
+            >
               <Checkbox.HiddenInput />
               <Checkbox.Control />
               <Checkbox.Label>Pokazać numery wierszy?</Checkbox.Label>
@@ -719,7 +850,14 @@ export const Editor = ({ params }: EditorProps) => {
                   <Download />
                 </Icon>
               </Button>
-              <Select.Root defaultValue={["png"]} collection={formats} size="sm" width={20} onValueChange={(e) => setImgFormat(e.value)} value={imgFormat}>
+              <Select.Root
+                defaultValue={["png"]}
+                collection={formats}
+                size="sm"
+                width={20}
+                onValueChange={(e) => setImgFormat(e.value)}
+                value={imgFormat}
+              >
                 <Select.HiddenSelect />
                 <Select.Control>
                   <Select.Trigger>
@@ -780,7 +918,10 @@ export const Editor = ({ params }: EditorProps) => {
                       <Dialog.ActionTrigger asChild>
                         <Button variant="outline">Anuluj</Button>
                       </Dialog.ActionTrigger>
-                      <Button onClick={() => handleDeleteProject()} colorPalette="red">
+                      <Button
+                        onClick={() => handleDeleteProject()}
+                        colorPalette="red"
+                      >
                         Usuń
                       </Button>
                     </Dialog.Footer>
@@ -832,14 +973,25 @@ export const CrosswordVisualization = ({
     const solutionLetter = solution[i] ?? "";
 
     const matchingIndexes = wordLetters
-      .map((letter, index) => (letter.toUpperCase() === (solutionLetter || "").toUpperCase() ? index : -1))
+      .map((letter, index) =>
+        letter.toUpperCase() === (solutionLetter || "").toUpperCase()
+          ? index
+          : -1
+      )
       .filter((index) => index !== -1);
 
-    const safeShift = typeof answer.shift === "number" && answer.shift >= 0 ? answer.shift : 0;
-    const selectedIndex = matchingIndexes.length > 0 ? matchingIndexes[Math.min(safeShift, matchingIndexes.length - 1)] : -1;
+    const safeShift =
+      typeof answer.shift === "number" && answer.shift >= 0 ? answer.shift : 0;
+    const selectedIndex =
+      matchingIndexes.length > 0
+        ? matchingIndexes[Math.min(safeShift, matchingIndexes.length - 1)]
+        : -1;
 
     return {
-      left: selectedIndex === -1 ? wordLetters : wordLetters.slice(0, selectedIndex),
+      left:
+        selectedIndex === -1
+          ? wordLetters
+          : wordLetters.slice(0, selectedIndex),
       right: selectedIndex === -1 ? [] : wordLetters.slice(selectedIndex + 1),
       solutionLetter,
       question: answer.question,
@@ -848,7 +1000,9 @@ export const CrosswordVisualization = ({
     };
   });
 
-  const maxLeftLength = Math.max(...finalArr.map((answer) => answer.left.length));
+  const maxLeftLength = Math.max(
+    ...finalArr.map((answer) => answer.left.length)
+  );
 
   const fontSize = size * 0.7;
 
@@ -881,33 +1035,17 @@ export const CrosswordVisualization = ({
   };
 
   return (
+    // POPRAWIONY ELEMENT - usunięcie flex="1" i ustawień overflow
     <Flex
       justifyContent="flex-start"
       alignItems="flex-start"
       minW="700px"
-      maxW="1000px"
       padding={4}
       w="auto"
-      h="440px"
-      maxH="440px"
-      minH="440px"
-      overflowX="auto"
-      overflowY="auto"
-      flex="1"
+      h="auto"
+      minH="368px"
       gap={6}
-      css={{
-        "&::-webkit-scrollbar": {
-          height: "8px",
-          width: "8px",
-        },
-        "&::-webkit-scrollbar-track": {
-          background: "#f1f1f1",
-        },
-        "&::-webkit-scrollbar-thumb": {
-          background: "#c1c1c1",
-          borderRadius: "4px",
-        },
-      }}
+      // usunięto overflowY='hidden' i overflowX='hidden'
     >
       {shouldShowQuestions && (
         <List.Root ml={6} as="ol" flexShrink={0}>
@@ -928,9 +1066,11 @@ export const CrosswordVisualization = ({
           <tbody>
             {finalArr.map((answer, rowIndex) => (
               <tr key={rowIndex}>
-                {Array.from({ length: maxLeftLength - answer.left.length }).map((_, index) => (
-                  <td key={`empty-left-${index}`} style={cellStyle} />
-                ))}
+                {Array.from({ length: maxLeftLength - answer.left.length }).map(
+                  (_, index) => (
+                    <td key={`empty-left-${index}`} style={cellStyle} />
+                  )
+                )}
 
                 {shouldShowIndexes && (
                   <td
@@ -950,7 +1090,9 @@ export const CrosswordVisualization = ({
                   </td>
                 ))}
 
-                <td style={solutionCellStyle}>{shouldShowAnswers ? answer.solutionLetter : ""}</td>
+                <td style={solutionCellStyle}>
+                  {shouldShowAnswers ? answer.solutionLetter : ""}
+                </td>
 
                 {answer.right.map((rightLetter, index) => (
                   <td key={`right-${index}`} style={answerCellStyle}>
@@ -965,5 +1107,3 @@ export const CrosswordVisualization = ({
     </Flex>
   );
 };
-
-export default Editor;

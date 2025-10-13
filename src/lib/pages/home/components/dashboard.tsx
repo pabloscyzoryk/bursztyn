@@ -1,13 +1,16 @@
 // imports
-import { Plus, Search, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import createNewCrossword from "@/lib/pages/home/utils/createNewCrossword";
 import { useEffect, useState } from "react";
-// components
-import { CrosswordPreview } from "@/lib/pages/home/components/crosswordpreview";
-import Link from "next/link";
+import createNewCrossword from "@/lib/pages/home/utils/createNewCrossword";
 
-// chakra-ui
+// types
+import { type Crossword } from "@/types/crossword";
+
+// components
+import Link from "next/link";
+import { CrosswordVisualization } from "@/components/preview/crosswordvisualization";
+
+// ui
 import {
   Center,
   Grid,
@@ -22,12 +25,17 @@ import {
   Kbd,
   Input,
 } from "@chakra-ui/react";
-import { Crossword } from "@/types/crossword";
+import { Plus, Search } from "lucide-react";
+
+// hooks
+import { useColorMode } from "@/components/ui/color-mode";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { CrosswordVisualization } from "@/components/preview/crosswordvisualization";
 
 export const Dashboard = () => {
   const router = useRouter();
+
+  const { colorMode } = useColorMode();
+
   const [crosswords, setCrosswords] = useLocalStorage<Crossword[]>(
     "crosswords",
     []
@@ -61,13 +69,14 @@ export const Dashboard = () => {
     if (!searchQuery.trim()) return true;
 
     const query = searchQuery.toLowerCase();
-    
+
     return (
       crossword.title?.toLowerCase().includes(query) ||
       crossword.solution?.toLowerCase().includes(query) ||
-      crossword.answers?.some(answer => 
-        answer.word?.toLowerCase().includes(query) ||
-        answer.question?.toLowerCase().includes(query)
+      crossword.answers?.some(
+        (answer) =>
+          answer.word?.toLowerCase().includes(query) ||
+          answer.question?.toLowerCase().includes(query)
       )
     );
   });
@@ -97,15 +106,9 @@ export const Dashboard = () => {
       mt={2}
       mb="100px"
     >
-      <InputGroup
-        mb={6}
-        mt={2}
-        maxW="40%"
-        flex="1"
-        startElement={<Search />}
-      >
-        <Input 
-          placeholder="Znajdź krzyżówkę..." 
+      <InputGroup mb={6} mt={2} maxW="40%" flex="1" startElement={<Search />}>
+        <Input
+          placeholder="Znajdź krzyżówkę..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -116,11 +119,11 @@ export const Dashboard = () => {
         templateColumns="repeat(auto-fit, minmax(400px, 1fr))"
         gap={25}
       >
-                <GridItem margin={25}>
+        <GridItem margin={25}>
           <Center
             w={400}
             h={450}
-            bgColor="gray.300"
+            bgColor={colorMode === "light" ? "gray.300" : "gray.900"}
             borderRadius="20px"
             onClick={() => createNewCrossword(router)}
             cursor="pointer"
@@ -152,7 +155,7 @@ export const Dashboard = () => {
                 h={450}
                 borderRadius="20px"
                 overflow="hidden"
-                bgColor="gray.300"
+                bgColor={colorMode === "light" ? "gray.300" : "gray.900"}
                 _hover={{
                   transform: "scale(1.01)",
                   transition: "transform 0.2s",
@@ -169,7 +172,7 @@ export const Dashboard = () => {
                     <Flex
                       flex={1}
                       justifyContent="center"
-                      alignItems="center"
+                      alignItems="start"
                       w="100%"
                       p={4}
                     >
@@ -197,8 +200,8 @@ export const Dashboard = () => {
           <GridItem colSpan={3}>
             <Center w="100%" py={10}>
               <Text fontSize="lg" color="gray.500">
-                {searchQuery.trim() 
-                  ? `Nie znaleziono krzyżówek pasujących do "${searchQuery}"` 
+                {searchQuery.trim()
+                  ? `Nie znaleziono krzyżówek pasujących do "${searchQuery}"`
                   : "Brak krzyżówek"}
               </Text>
             </Center>
