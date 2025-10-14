@@ -1,6 +1,6 @@
 // imports
 
-// chakra-ui
+// ui
 import {
   Text,
   Box,
@@ -12,7 +12,7 @@ import {
   Textarea,
   Spinner,
   Field,
-  Input
+  Input,
 } from "@chakra-ui/react";
 import { Button } from "@/components/ui/button";
 import { FC, FormEvent, useEffect, useRef, useState } from "react";
@@ -49,22 +49,28 @@ export const Footer = () => {
 
   useEffect(() => {
     emailjs.init({
-      publicKey: "7prcEej_s0wj6KyHI",
+      publicKey: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || "",
     });
   }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
+    if (message.length === 0) {
+      setError("Pole z wiadomością jest wymagane.");
+      setIsSuccess(false);
+      return;
+    }
+
     setError("");
     setIsPending(true);
     setIsSuccess(false);
-    setHasUserStartedTyping(false); 
+    setHasUserStartedTyping(false);
 
     try {
       await emailjs.sendForm(
-        "service_pjp2ong_bursztyn",
-        "template_8aw0nbd",
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE || "",
+        process.env.NEXT_PUBLIC_EMAILJS_FORM_TEMPLATE || "",
         formRef.current as HTMLFormElement
       );
       setName("");
@@ -88,7 +94,8 @@ export const Footer = () => {
     }
   };
 
-  const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>) => 
+  const handleInputChange =
+    (setter: React.Dispatch<React.SetStateAction<string>>) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setter(e.target.value);
     };
@@ -136,8 +143,8 @@ export const Footer = () => {
                       flex="1"
                       fontSize={16}
                       resize="none"
-                      type='text'
-                      name='name'
+                      type="text"
+                      name="name"
                       value={name}
                       onChange={handleInputChange(setName)}
                     />
@@ -149,8 +156,8 @@ export const Footer = () => {
                       flex="1"
                       fontSize={16}
                       resize="none"
-                      type='email'
-                      name='email'
+                      type="email"
+                      name="email"
                       value={email}
                       onChange={handleInputChange(setEmail)}
                     />
@@ -164,14 +171,16 @@ export const Footer = () => {
                       fontSize={16}
                       resize="none"
                       minH={200}
-                      name='message'
+                      name="message"
                       value={message}
                       onChange={handleInputChange(setMessage)}
                     />
                   </Field.Root>
 
                   {error && <Text color="red.300">{error}</Text>}
-                  {isSuccess && <Text color='green'>Wiadomość wysłana pomyślnie!</Text>}
+                  {isSuccess && (
+                    <Text color="green">Wiadomość wysłana pomyślnie!</Text>
+                  )}
                 </Dialog.Body>
                 <Dialog.Footer>
                   <Dialog.ActionTrigger asChild>

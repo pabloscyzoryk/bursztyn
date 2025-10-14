@@ -17,6 +17,9 @@ importers:
       '@emotion/react':
         specifier: ^11.14.0
         version: 11.14.0(@types/react@19.1.11)(react@19.2.0)
+      '@next/env':
+        specifier: ^15.5.5
+        version: 15.5.5
       canvas:
         specifier: ^3.2.0
         version: 3.2.0
@@ -725,6 +728,9 @@ packages:
 
   '@next/env@15.5.0':
     resolution: {integrity: sha512-sDaprBAfzCQiOgo2pO+LhnV0Wt2wBgartjrr+dpcTORYVnnXD0gwhHhiiyIih9hQbq+JnbqH4odgcFWhqCGidw==}
+
+  '@next/env@15.5.5':
+    resolution: {integrity: sha512-2Zhvss36s/yL+YSxD5ZL5dz5pI6ki1OLxYlh6O77VJ68sBnlUrl5YqhBgCy7FkdMsp9RBeGFwpuDCdpJOqdKeQ==}
 
   '@next/swc-darwin-arm64@15.5.0':
     resolution: {integrity: sha512-v7Jj9iqC6enxIRBIScD/o0lH7QKvSxq2LM8UTyqJi+S2w2QzhMYjven4vgu/RzgsdtdbpkyCxBTzHl/gN5rTRg==}
@@ -3938,6 +3944,8 @@ snapshots:
   '@next/env@13.5.11': {}
 
   '@next/env@15.5.0': {}
+
+  '@next/env@15.5.5': {}
 
   '@next/swc-darwin-arm64@15.5.0':
     optional: true
