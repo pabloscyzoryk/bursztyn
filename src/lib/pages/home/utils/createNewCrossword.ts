@@ -30,6 +30,7 @@ const createNewCrossword = (router: AppRouterInstance) => {
     shouldShowAnswers: true,
     shouldShowQuestions: false,
     size: 15,
+    spacesAfterIndexes: []
   });
   localStorage.setItem("crosswords", JSON.stringify(crosswords));
   router.replace(`/${id}`);

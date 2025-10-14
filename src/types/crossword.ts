@@ -17,6 +17,7 @@ export type Crossword = {
     answersBorderColor: string,
     solutionBorderColor: string,
     size: number,
+    spacesAfterIndexes: number[],
     answersBorderThickness: number,
     solutionBorderThickness: number,
     answersBackgroundColor: string,

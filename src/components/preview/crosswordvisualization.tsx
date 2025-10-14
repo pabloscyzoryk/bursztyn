@@ -14,6 +14,7 @@ interface CrosswordVisualizationProps {
   shouldShowAnswers: boolean;
   shouldShowQuestions: boolean;
   size: number;
+  spacesAfterIndexes: number[];
 }
 
 export const CrosswordVisualization = ({
@@ -29,6 +30,7 @@ export const CrosswordVisualization = ({
   shouldShowAnswers,
   shouldShowQuestions,
   size,
+  spacesAfterIndexes,
 }: CrosswordVisualizationProps) => {
   const finalArr = answers.map((answer, i) => {
     const wordLetters = (answer.word || "").split("");
@@ -41,6 +43,7 @@ export const CrosswordVisualization = ({
           : -1
       )
       .filter((index) => index !== -1);
+
     const safeShift =
       typeof answer.shift === "number" && answer.shift >= 0 ? answer.shift : 0;
     const selectedIndex =
@@ -63,6 +66,9 @@ export const CrosswordVisualization = ({
 
   const maxLeftLength = Math.max(
     ...finalArr.map((answer) => answer.left.length)
+  );
+  const maxRightLength = Math.max(
+    ...finalArr.map((answer) => answer.right.length)
   );
 
   const fontSize = size * 0.7;
@@ -95,33 +101,30 @@ export const CrosswordVisualization = ({
     fontSize: `${fontSize}px`,
   };
 
+  // Oblicz całkowitą liczbę kolumn dla spójności
+  const totalColumns = maxLeftLength + (shouldShowIndexes ? 1 : 0) + 1 + maxRightLength;
+
   return (
     <Flex
-      justifyContent="center"
-      alignItems="center"
+      justifyContent="flex-start"
+      alignItems="flex-start"
+      minW="700px"
       padding={4}
       w="auto"
       h="auto"
-      flex="1"
+      minH="368px"
       gap={6}
     >
       {shouldShowQuestions && (
-        <List.Root
-          minW="300px" 
-          ml={6}
-          as="ol"
-          h="100%"
-          overflowY="auto"
-          flexShrink={0}
-        >
+        <List.Root ml={6} as="ol" flexShrink={0}>
           {answers.map((answer, index) => (
-            <Text as="li" key={index} maxW="300px" mb={1} lineHeight="1.2"> 
+            <List.Item key={index} maxW="300px">
               {answer.question}
-            </Text>
+            </List.Item>
           ))}
         </List.Root>
       )}
-      <Flex w="auto" h='auto' justifyContent="center" gap={4} flexShrink={0}>
+      <Flex w="100%" justifyContent="center" gap={4}>
         <table
           style={{
             borderCollapse: "collapse",
@@ -130,41 +133,78 @@ export const CrosswordVisualization = ({
         >
           <tbody>
             {finalArr.map((answer, rowIndex) => (
-              <tr key={rowIndex}>
-                {Array.from({ length: maxLeftLength - answer.left.length }).map(
-                  (_, index) => (
-                    <td key={`empty-left-${index}`} style={cellStyle} />
-                  )
+              <>
+                <tr key={`row-${rowIndex}`}>
+                  {/* Lewe puste komórki */}
+                  {Array.from({ length: maxLeftLength - answer.left.length }).map(
+                    (_, index) => (
+                      <td key={`empty-left-${index}`} style={cellStyle} />
+                    )
+                  )}
+
+                  {/* Komórka indeksu */}
+                  {shouldShowIndexes && (
+                    <td
+                      style={{
+                        ...cellStyle,
+                        fontSize: `${fontSize * 0.8}px`,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {rowIndex + 1}.
+                    </td>
+                  )}
+                  {/* Lewe litery */}
+                  {answer.left.map((leftLetter, index) => (
+                    <td key={`left-${index}`} style={answerCellStyle}>
+                      {shouldShowAnswers ? leftLetter : ""}
+                    </td>
+                  ))}
+
+
+                  {/* Komórka rozwiązania */}
+                  <td style={solutionCellStyle}>
+                    {shouldShowAnswers ? answer.solutionLetter : ""}
+                  </td>
+
+                  {/* Prawe litery */}
+                  {answer.right.map((rightLetter, index) => (
+                    <td key={`right-${index}`} style={answerCellStyle}>
+                      {shouldShowAnswers ? rightLetter : ""}
+                    </td>
+                  ))}
+
+                  {/* Prawe puste komórki */}
+                  {Array.from({ length: maxRightLength - answer.right.length }).map(
+                    (_, index) => (
+                      <td key={`empty-right-${index}`} style={cellStyle} />
+                    )
+                  )}
+                </tr>
+                
+                {/* Wiersz spacji - poprawiona wersja */}
+                {spacesAfterIndexes?.includes(rowIndex) && (
+                  <tr key={`space-${rowIndex}`}>
+                    {/* Lewe puste komórki */}
+                    {Array.from({ length: maxLeftLength }).map((_, index) => (
+                      <td key={`space-left-${index}`} style={cellStyle} />
+                    ))}
+                    
+                    {/* Pusta komórka indeksu jeśli needed */}
+                    {shouldShowIndexes && (
+                      <td style={cellStyle} />
+                    )}
+                    
+                    {/* Komórka rozwiązania - PUSTA ale z zachowaniem stylu */}
+                    <td style={solutionCellStyle}></td>
+                    
+                    {/* Prawe puste komórki */}
+                    {Array.from({ length: maxRightLength }).map((_, index) => (
+                      <td key={`space-right-${index}`} style={cellStyle} />
+                    ))}
+                  </tr>
                 )}
-
-                {shouldShowIndexes && (
-                  <td
-                    style={{
-                      ...cellStyle,
-                      fontSize: `${fontSize * 0.8}px`,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {rowIndex + 1}.
-                  </td>
-                )}
-
-                {answer.left.map((leftLetter, index) => (
-                  <td key={`left-${index}`} style={answerCellStyle}>
-                    {shouldShowAnswers ? leftLetter : ""}
-                  </td>
-                ))}
-
-                <td style={solutionCellStyle}>
-                  {shouldShowAnswers ? answer.solutionLetter : ""}
-                </td>
-
-                {answer.right.map((rightLetter, index) => (
-                  <td key={`right-${index}`} style={answerCellStyle}>
-                    {shouldShowAnswers ? rightLetter : ""}
-                  </td>
-                ))}
-              </tr>
+              </>
             ))}
           </tbody>
         </table>

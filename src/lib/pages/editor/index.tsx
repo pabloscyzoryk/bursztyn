@@ -35,33 +35,14 @@ import {
   Moon,
   Plus,
   Printer,
+  Space,
   Sun,
   Trash2,
 } from "lucide-react";
 import updateCrosswordLocalStorage from "@/lib/pages/editor/utils/updateCrosswordLocalStorage";
 import * as htmlToImage from "html-to-image";
 import { useColorMode } from "@/components/ui/color-mode";
-
-// Zastąp ten import faktyczną ścieżką do Twojego komponentu
-// Zakładam, że ten komponent jest w innym pliku lub musi być zaimportowany
-// export const CrosswordVisualization = (props: CrosswordVisualizationProps) => { /* ... */ }
-interface CrosswordVisualizationProps {
-    solution: string;
-    answers: Answer[];
-    answersBackgroundColor: string;
-    answersBorderColor: string;
-    answersBorderThickness: number;
-    shouldShowIndexes: boolean;
-    solutionBorderColor: string;
-    solutionBorderThickness: number;
-    solutionsBackgroundColor: string;
-    shouldShowAnswers: boolean;
-    shouldShowQuestions: boolean;
-    size: number;
-}
-// Poniżej znajduje się definicja CrosswordVisualization w tym samym pliku
-// by zapewnić kompletność i wprowadzić poprawkę.
-
+import { CrosswordVisualization } from "@/components/preview/crosswordvisualization";
 
 interface EditorProps {
   params: Promise<{ id: string }>;
@@ -76,6 +57,7 @@ export const Editor = ({ params }: EditorProps) => {
 
   const [crossword, setCrossword] = useState<Crossword | null>(null);
   const [imgFormat, setImgFormat] = useState(["png"]);
+  const [lastSpaceAdded, setLastSpaceAdded] = useState<number | null>(null); // Śledzi kiedy ostatnio dodano spację
 
   const setTitle = (title: string) => {
     if (crossword) {
@@ -137,6 +119,12 @@ export const Editor = ({ params }: EditorProps) => {
     }
   };
 
+  const setSpacesAfterIndexes = (spacesAfterIndexes: number[]) => {
+    if (crossword) {
+      setCrossword({ ...crossword, spacesAfterIndexes });
+    }
+  };
+
   const setShouldShowAnswers = (shouldShowAnswers: boolean) => {
     if (crossword) {
       setCrossword({ ...crossword, shouldShowAnswers });
@@ -174,6 +162,10 @@ export const Editor = ({ params }: EditorProps) => {
       if (!found) return router.replace("/");
 
       setCrossword(found);
+      // Ustawiamy lastSpaceAdded na ostatni indeks jeśli są spacje
+      if (found.spacesAfterIndexes && found.spacesAfterIndexes.length > 0) {
+        setLastSpaceAdded(Math.max(...found.spacesAfterIndexes));
+      }
     } catch (err) {
       console.error("Error loading crossword:", err);
       router.replace("/");
@@ -206,18 +198,68 @@ export const Editor = ({ params }: EditorProps) => {
       shift: 0,
     });
     setAnswers(temp);
+    // Resetujemy lastSpaceAdded po dodaniu nowego pytania, aby można było dodać kolejną spację
+    setLastSpaceAdded(null);
   };
 
-  const handleDeleteQuestion = (index: number) => {
+  const handleAddSpace = () => {
     if (!crossword) return;
 
-    const temp = [...crossword.answers];
-    const filtered = temp.filter(
-      (answer, answerIndex) => index !== answerIndex
-    );
-    setAnswers(filtered);
+    const currentIndex = crossword.answers.length - 1;
+    if (currentIndex < 0) return;
+
+    // Sprawdzamy czy już dodano spację po tym samym wierszu
+    if (lastSpaceAdded === currentIndex) {
+      return; // Nie dodajemy kolejnej spacji po tym samym wierszu
+    }
+
+    const temp = [...crossword.spacesAfterIndexes];
+    // Dodajemy spację po ostatnim wierszu
+    temp.push(currentIndex);
+    setSpacesAfterIndexes(temp);
+    setLastSpaceAdded(currentIndex); // Zapisujemy, że dodaliśmy spację po tym wierszu
   };
 
+  const handleRemoveLastSpace = () => {
+    if (!crossword) return;
+
+    const temp = [...crossword.spacesAfterIndexes];
+    if (temp.length > 0) {
+      const removedIndex = temp[temp.length - 1];
+      temp.pop();
+      setSpacesAfterIndexes(temp);
+      
+      // Aktualizujemy lastSpaceAdded
+      if (temp.length > 0) {
+        setLastSpaceAdded(Math.max(...temp));
+      } else {
+        setLastSpaceAdded(null);
+      }
+    }
+  };
+
+   const handleDeleteQuestion = (index: number) => {
+    if (!crossword) return;
+
+    const newAnswers = crossword.answers.filter((_, answerIndex) => index !== answerIndex);
+    
+    const updatedSpaces = crossword.spacesAfterIndexes
+      .filter(spaceIndex => spaceIndex !== index)
+      .map(spaceIndex => spaceIndex > index ? spaceIndex - 1 : spaceIndex);
+
+    setCrossword({
+      ...crossword,
+      answers: newAnswers,
+      spacesAfterIndexes: updatedSpaces
+    });
+
+    // Aktualizujemy lastSpaceAdded
+    if (updatedSpaces.length > 0) {
+      setLastSpaceAdded(Math.max(...updatedSpaces));
+    } else {
+      setLastSpaceAdded(null);
+    }
+  };
   const handleDeleteProject = () => {
     const crosswordsLC = localStorage.getItem("crosswords");
 
@@ -625,6 +667,32 @@ export const Editor = ({ params }: EditorProps) => {
             </Icon>
           </Button>
         </Center>
+        <Center mt={2}>
+          <Button
+            onClick={() => handleAddSpace()}
+            colorPalette="yellow"
+            color="white"
+            disabled={lastSpaceAdded === crossword.answers.length - 1} // Wyłączamy tylko jeśli ostatnio dodano spację po tym samym wierszu
+          >
+            Dodaj spację
+            <Icon>
+              <Space />
+            </Icon>
+          </Button>
+        </Center>
+        <Center mt={2}>
+          <Button
+            onClick={() => handleRemoveLastSpace()}
+            colorPalette="red"
+            color="white"
+            disabled={crossword.spacesAfterIndexes.length === 0} // Wyłączamy jeśli nie ma spacji
+          >
+            Usuń spację
+            <Icon>
+              <Trash2 />
+            </Icon>
+          </Button>
+        </Center>
       </VStack>
 
       <VStack minW={1000}>
@@ -633,11 +701,10 @@ export const Editor = ({ params }: EditorProps) => {
           alignItems="center"
           direction="column"
           overflowY="auto"
-          overflowX='auto'
+          overflowX="auto"
           p={4}
           maxW={1000}
           maxH={440}
-          
         >
           <Text
             h={4}
@@ -662,6 +729,7 @@ export const Editor = ({ params }: EditorProps) => {
             size={crossword.size + 10}
             shouldShowAnswers={crossword.shouldShowAnswers}
             shouldShowQuestions={crossword.shouldShowQuestions}
+            spacesAfterIndexes={crossword.spacesAfterIndexes}
           />
         </Flex>
         <Flex gap={6}>
@@ -935,175 +1003,6 @@ export const Editor = ({ params }: EditorProps) => {
           </Flex>
         </Flex>
       </VStack>
-    </Flex>
-  );
-};
-
-interface CrosswordVisualizationProps {
-  solution: string;
-  answers: Answer[];
-  answersBackgroundColor: string;
-  answersBorderColor: string;
-  answersBorderThickness: number;
-  shouldShowIndexes: boolean;
-  solutionBorderColor: string;
-  solutionBorderThickness: number;
-  solutionsBackgroundColor: string;
-  shouldShowAnswers: boolean;
-  shouldShowQuestions: boolean;
-  size: number;
-}
-
-export const CrosswordVisualization = ({
-  solution,
-  answers,
-  answersBackgroundColor,
-  answersBorderColor,
-  answersBorderThickness,
-  shouldShowIndexes,
-  solutionBorderColor,
-  solutionBorderThickness,
-  solutionsBackgroundColor,
-  shouldShowAnswers,
-  shouldShowQuestions,
-  size,
-}: CrosswordVisualizationProps) => {
-  const finalArr = answers.map((answer, i) => {
-    const wordLetters = (answer.word || "").split("");
-    const solutionLetter = solution[i] ?? "";
-
-    const matchingIndexes = wordLetters
-      .map((letter, index) =>
-        letter.toUpperCase() === (solutionLetter || "").toUpperCase()
-          ? index
-          : -1
-      )
-      .filter((index) => index !== -1);
-
-    const safeShift =
-      typeof answer.shift === "number" && answer.shift >= 0 ? answer.shift : 0;
-    const selectedIndex =
-      matchingIndexes.length > 0
-        ? matchingIndexes[Math.min(safeShift, matchingIndexes.length - 1)]
-        : -1;
-
-    return {
-      left:
-        selectedIndex === -1
-          ? wordLetters
-          : wordLetters.slice(0, selectedIndex),
-      right: selectedIndex === -1 ? [] : wordLetters.slice(selectedIndex + 1),
-      solutionLetter,
-      question: answer.question,
-      wordArr: wordLetters,
-      selectedIndex,
-    };
-  });
-
-  const maxLeftLength = Math.max(
-    ...finalArr.map((answer) => answer.left.length)
-  );
-
-  const fontSize = size * 0.7;
-
-  const cellStyle = {
-    width: `${size}px`,
-    height: `${size}px`,
-    maxWidth: `${size}px`,
-    maxHeight: `${size}px`,
-    minWidth: `${size}px`,
-    minHeight: `${size}px`,
-    textAlign: "center" as const,
-    padding: 0,
-    margin: 0,
-    lineHeight: 1,
-  };
-
-  const answerCellStyle = {
-    ...cellStyle,
-    border: `${answersBorderThickness}px solid ${answersBorderColor}`,
-    backgroundColor: answersBackgroundColor,
-    fontSize: `${fontSize}px`,
-  };
-
-  const solutionCellStyle = {
-    ...cellStyle,
-    border: `${solutionBorderThickness}px solid ${solutionBorderColor}`,
-    backgroundColor: solutionsBackgroundColor,
-    fontWeight: "bold" as const,
-    fontSize: `${fontSize}px`,
-  };
-
-  return (
-    // POPRAWIONY ELEMENT - usunięcie flex="1" i ustawień overflow
-    <Flex
-      justifyContent="flex-start"
-      alignItems="flex-start"
-      minW="700px"
-      padding={4}
-      w="auto"
-      h="auto"
-      minH="368px"
-      gap={6}
-      // usunięto overflowY='hidden' i overflowX='hidden'
-    >
-      {shouldShowQuestions && (
-        <List.Root ml={6} as="ol" flexShrink={0}>
-          {answers.map((answer, index) => (
-            <List.Item key={index} maxW="300px">
-              {answer.question}
-            </List.Item>
-          ))}
-        </List.Root>
-      )}
-      <Flex w="100%" justifyContent="center" gap={4}>
-        <table
-          style={{
-            borderCollapse: "collapse",
-            marginTop: shouldShowQuestions ? "10px" : "0px",
-          }}
-        >
-          <tbody>
-            {finalArr.map((answer, rowIndex) => (
-              <tr key={rowIndex}>
-                {Array.from({ length: maxLeftLength - answer.left.length }).map(
-                  (_, index) => (
-                    <td key={`empty-left-${index}`} style={cellStyle} />
-                  )
-                )}
-
-                {shouldShowIndexes && (
-                  <td
-                    style={{
-                      ...cellStyle,
-                      fontSize: `${fontSize * 0.8}px`,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {rowIndex + 1}.
-                  </td>
-                )}
-
-                {answer.left.map((leftLetter, index) => (
-                  <td key={`left-${index}`} style={answerCellStyle}>
-                    {shouldShowAnswers ? leftLetter : ""}
-                  </td>
-                ))}
-
-                <td style={solutionCellStyle}>
-                  {shouldShowAnswers ? answer.solutionLetter : ""}
-                </td>
-
-                {answer.right.map((rightLetter, index) => (
-                  <td key={`right-${index}`} style={answerCellStyle}>
-                    {shouldShowAnswers ? rightLetter : ""}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </Flex>
     </Flex>
   );
 };
