@@ -1,98 +1,28 @@
 // imports
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-
-// utils
-import createNewCrossword from '@/lib/pages/home/utils/createNewCrossword';
-
-// types
-import { type Crossword } from '@/types/crossword';
-
-// components
-import Link from 'next/link';
-import { CrosswordVisualization } from '@/components/preview/crosswordvisualization';
 
 // ui
 import {
-  Center,
   Grid,
-  GridItem,
-  Text,
-  VStack,
-  Icon,
   Flex,
-  Box,
-  InputGroup,
-  Input,
 } from '@chakra-ui/react';
-import { Plus, Search } from 'lucide-react';
 
 // hooks
-import { useColorMode } from '@/components/ui/color-mode';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useCrosswordsManager } from '@/lib/pages/home/hooks/useCrosswordsManager';
+
+// components
+import { LoadingState } from '@/lib/pages/home/components/loadingState';
+import { SearchBar } from '@/lib/pages/home/components/searchBar';
+import { NewCrosswordCard } from '@/lib/pages/home/components/newCrosswordCard';
+import { CrosswordCard } from '@/lib/pages/home/components/crosswordCard';
+import { EmptyState } from '@/lib/pages/home/components/emptyState';
 
 export const Dashboard = () => {
   const router = useRouter();
-
-  const { colorMode } = useColorMode();
-
-  const [crosswords, setCrosswords] = useLocalStorage<Crossword[]>(
-    'crosswords',
-    [],
-  );
-  const [isClient, setIsClient] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isClient) return;
-
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'crosswords' && e.newValue) {
-        try {
-          const newCrosswords = JSON.parse(e.newValue);
-          setCrosswords(newCrosswords);
-        } catch (error) {
-          console.error('Error syncing crosswords from localStorage:', error);
-        }
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, [isClient]);
-
-  const filteredCrosswords = crosswords.filter(crossword => {
-    if (!searchQuery.trim()) return true;
-
-    const query = searchQuery.toLowerCase();
-
-    return (
-      crossword.title?.toLowerCase().includes(query) ||
-      crossword.solution?.toLowerCase().includes(query) ||
-      crossword.answers?.some(
-        answer =>
-          answer.word?.toLowerCase().includes(query) ||
-          answer.question?.toLowerCase().includes(query),
-      )
-    );
-  });
-
-  const sortedCrosswords = [...filteredCrosswords].sort((a, b) => {
-    const dateA = new Date(a.lastModifiedAt || 0).getTime();
-    const dateB = new Date(b.lastModifiedAt || 0).getTime();
-    return dateB - dateA;
-  });
+  const { crosswords, isClient, searchQuery, setSearchQuery } = useCrosswordsManager();
 
   if (!isClient) {
-    return (
-      <Center w="100vw" minH="50vh" minW="100vw" mt={2}>
-        <Text>Ładowanie...</Text>
-      </Center>
-    );
+    return <LoadingState />;
   }
 
   return (
@@ -106,107 +36,21 @@ export const Dashboard = () => {
       mt={2}
       mb="100px"
     >
-      <InputGroup mb={6} mt={2} maxW="40%" flex="1" startElement={<Search />}>
-        <Input
-          placeholder="Znajdź krzyżówkę..."
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-        />
-      </InputGroup>
+      <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
       <Grid
         maxW="90%"
         templateColumns="repeat(auto-fit, minmax(400px, 1fr))"
         gap={25}
       >
-        <GridItem margin={25}>
-          <Center
-            w={400}
-            h={450}
-            bgColor={colorMode === 'light' ? 'gray.300' : 'gray.900'}
-            borderRadius="20px"
-            onClick={() => createNewCrossword(router)}
-            cursor="pointer"
-            _hover={{ transform: 'scale(1.02)', transition: 'transform 0.2s' }}
-          >
-            <VStack
-              borderRadius={16}
-              cursor="pointer"
-              px={8}
-              py={12}
-              bg="teal.600"
-              _hover={{ bg: 'teal.500' }}
-              transitionDuration="fast"
-            >
-              <Center>
-                <Icon color="white">
-                  <Plus />
-                </Icon>
-              </Center>
-              <Text color="white">Utwórz nową</Text>
-            </VStack>
-          </Center>
-        </GridItem>
-        {sortedCrosswords.length > 0 ? (
-          sortedCrosswords.map(c => (
-            <GridItem className="group" w={400} margin={25} key={c.id}>
-              <Box
-                w={400}
-                h={450}
-                borderRadius="20px"
-                overflow="hidden"
-                bgColor={colorMode === 'light' ? 'gray.300' : 'gray.900'}
-                _hover={{
-                  transform: 'scale(1.01)',
-                  transition: 'transform 0.2s',
-                }}
-              >
-                <Link
-                  href={`/${c.id}`}
-                  style={{ display: 'block', width: '100%', height: '100%' }}
-                >
-                  <VStack w="100%" h="100%">
-                    <Center m={4} flexShrink={0}>
-                      <Text fontWeight="bold">{c.title}</Text>
-                    </Center>
-                    <Flex
-                      flex={1}
-                      justifyContent="center"
-                      alignItems="start"
-                      w="100%"
-                      p={4}
-                    >
-                      <CrosswordVisualization
-                        answers={c.answers}
-                        answersBackgroundColor={c.answersBackgroundColor}
-                        answersBorderColor={c.answersBorderColor}
-                        answersBorderThickness={c.answersBorderThickness}
-                        shouldShowIndexes={c.shouldShowIndexes}
-                        solution={c.solution}
-                        solutionBorderColor={c.solutionBorderColor}
-                        solutionBorderThickness={c.solutionBorderThickness}
-                        solutionsBackgroundColor={c.solutionsBackgroundColor}
-                        size={20}
-                        shouldShowAnswers={true}
-                        shouldShowQuestions={false}
-                        spacesAfterIndexes={c.spacesAfterIndexes}
-                      />
-                    </Flex>
-                  </VStack>
-                </Link>
-              </Box>
-            </GridItem>
+        <NewCrosswordCard router={router} />
+        
+        {crosswords.length > 0 ? (
+          crosswords.map(crossword => (
+            <CrosswordCard key={crossword.id} crossword={crossword} />
           ))
         ) : (
-          <GridItem colSpan={3}>
-            <Center w="100%" py={10}>
-              <Text fontSize="lg" color="gray.500">
-                {searchQuery.trim()
-                  ? `Nie znaleziono krzyżówek pasujących do "${searchQuery}"`
-                  : 'Brak krzyżówek'}
-              </Text>
-            </Center>
-          </GridItem>
+          <EmptyState searchQuery={searchQuery} />
         )}
       </Grid>
     </Flex>

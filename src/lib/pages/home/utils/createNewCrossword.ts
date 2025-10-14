@@ -4,7 +4,7 @@
 import { type Crossword } from '@/types/crossword';
 import { type AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
-const createNewCrossword = (router: AppRouterInstance) => {
+export const createNewCrossword = (router: AppRouterInstance) => {
   const id = crypto.randomUUID();
   if (!localStorage.getItem('crosswords')) {
     localStorage.setItem('crosswords', JSON.stringify([]));
@@ -36,5 +36,3 @@ const createNewCrossword = (router: AppRouterInstance) => {
   localStorage.setItem('crosswords', JSON.stringify(crosswords));
   router.replace(`/${id}`);
 };
-
-export default createNewCrossword;

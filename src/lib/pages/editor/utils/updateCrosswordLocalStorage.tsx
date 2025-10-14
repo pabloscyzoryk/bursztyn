@@ -19,7 +19,7 @@ export type CrosswordToSave = {
   solutionsBackgroundColor: string;
 };
 
-const updateCrosswordLocalStorage = (crossword: CrosswordToSave) => {
+export const updateCrosswordLocalStorage = (crossword: CrosswordToSave) => {
   const crosswords = localStorage.getItem('crosswords');
   if (!crosswords) {
     return;
@@ -48,5 +48,3 @@ const updateCrosswordLocalStorage = (crossword: CrosswordToSave) => {
     console.error('Error processing crosswords from localStorage:', error);
   }
 };
-
-export default updateCrosswordLocalStorage;
