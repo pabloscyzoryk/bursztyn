@@ -162,7 +162,6 @@ export const Editor = ({ params }: EditorProps) => {
       if (!found) return router.replace("/");
 
       setCrossword(found);
-      // Ustawiamy lastSpaceAdded na ostatni indeks jeśli są spacje
       if (found.spacesAfterIndexes && found.spacesAfterIndexes.length > 0) {
         setLastSpaceAdded(Math.max(...found.spacesAfterIndexes));
       }
@@ -198,7 +197,6 @@ export const Editor = ({ params }: EditorProps) => {
       shift: 0,
     });
     setAnswers(temp);
-    // Resetujemy lastSpaceAdded po dodaniu nowego pytania, aby można było dodać kolejną spację
     setLastSpaceAdded(null);
   };
 
@@ -208,16 +206,14 @@ export const Editor = ({ params }: EditorProps) => {
     const currentIndex = crossword.answers.length - 1;
     if (currentIndex < 0) return;
 
-    // Sprawdzamy czy już dodano spację po tym samym wierszu
     if (lastSpaceAdded === currentIndex) {
-      return; // Nie dodajemy kolejnej spacji po tym samym wierszu
+      return;
     }
 
     const temp = [...crossword.spacesAfterIndexes];
-    // Dodajemy spację po ostatnim wierszu
     temp.push(currentIndex);
     setSpacesAfterIndexes(temp);
-    setLastSpaceAdded(currentIndex); // Zapisujemy, że dodaliśmy spację po tym wierszu
+    setLastSpaceAdded(currentIndex);
   };
 
   const handleRemoveLastSpace = () => {
@@ -225,11 +221,9 @@ export const Editor = ({ params }: EditorProps) => {
 
     const temp = [...crossword.spacesAfterIndexes];
     if (temp.length > 0) {
-      const removedIndex = temp[temp.length - 1];
       temp.pop();
       setSpacesAfterIndexes(temp);
       
-      // Aktualizujemy lastSpaceAdded
       if (temp.length > 0) {
         setLastSpaceAdded(Math.max(...temp));
       } else {
@@ -253,7 +247,6 @@ export const Editor = ({ params }: EditorProps) => {
       spacesAfterIndexes: updatedSpaces
     });
 
-    // Aktualizujemy lastSpaceAdded
     if (updatedSpaces.length > 0) {
       setLastSpaceAdded(Math.max(...updatedSpaces));
     } else {
@@ -560,9 +553,10 @@ export const Editor = ({ params }: EditorProps) => {
             borderRadius="md"
             minW="0"
             width="100%"
+            mt={-4}
           >
-            <Field.Root orientation="vertical" flex="1" minW="0">
-              <Field.Label>Pytanie nr {index + 1}</Field.Label>
+            <Field.Root mt={5} orientation="vertical" flex="1" minW="0">
+              <Field.Label>Pytanie nr {index + 1}{crossword.solution[index] && `, litera: ${crossword.solution[index]}`}</Field.Label>
               <Textarea
                 placeholder="Treść pytania"
                 flex="1"
