@@ -14,6 +14,7 @@ import {
   Spinner,
   Field,
   Input,
+  Button,
 } from '@chakra-ui/react';
 import { DiGithubBadge } from 'react-icons/di';
 import { FaInstagram } from 'react-icons/fa';
@@ -22,7 +23,6 @@ import { FaInstagram } from 'react-icons/fa';
 import { type FormEvent } from 'react';
 
 // components
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 // libs

@@ -15,7 +15,6 @@ import {
   Field,
   HStack,
   Center,
-  Button,
   Icon,
   Textarea,
   parseColor,
@@ -30,6 +29,7 @@ import {
   Box,
   Text,
   IconButton,
+  Button,
 } from '@chakra-ui/react';
 
 import {
@@ -69,7 +69,7 @@ export const Editor = ({ params }: EditorProps) => {
 
   const [crossword, setCrossword] = useState<Crossword | null>(null);
   const [imgFormat, setImgFormat] = useState(['png']);
-  const [lastSpaceAdded, setLastSpaceAdded] = useState<number | null>(null); // Śledzi kiedy ostatnio dodano spację
+  const [lastSpaceAdded, setLastSpaceAdded] = useState<number | null>(null);
 
   const setTitle = (title: string) => {
     if (crossword) {
@@ -684,7 +684,10 @@ export const Editor = ({ params }: EditorProps) => {
             onClick={() => handleAddSpace()}
             colorPalette="yellow"
             color="white"
-            disabled={lastSpaceAdded === crossword.answers.length - 1} // Wyłączamy tylko jeśli ostatnio dodano spację po tym samym wierszu
+            disabled={
+              lastSpaceAdded === crossword.answers.length - 1 ||
+              crossword.answers.length === 0
+            }
           >
             Dodaj spację
             <Icon>
@@ -697,7 +700,7 @@ export const Editor = ({ params }: EditorProps) => {
             onClick={() => handleRemoveLastSpace()}
             colorPalette="red"
             color="white"
-            disabled={crossword.spacesAfterIndexes.length === 0} // Wyłączamy jeśli nie ma spacji
+            disabled={crossword.spacesAfterIndexes.length === 0}
           >
             Usuń spację
             <Icon>
