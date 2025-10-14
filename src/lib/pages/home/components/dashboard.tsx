@@ -1,14 +1,14 @@
 // imports
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import createNewCrossword from "@/lib/pages/home/utils/createNewCrossword";
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import createNewCrossword from '@/lib/pages/home/utils/createNewCrossword';
 
 // types
-import { type Crossword } from "@/types/crossword";
+import { type Crossword } from '@/types/crossword';
 
 // components
-import Link from "next/link";
-import { CrosswordVisualization } from "@/components/preview/crosswordvisualization";
+import Link from 'next/link';
+import { CrosswordVisualization } from '@/components/preview/crosswordvisualization';
 
 // ui
 import {
@@ -24,12 +24,12 @@ import {
   InputGroup,
   Kbd,
   Input,
-} from "@chakra-ui/react";
-import { Plus, Search } from "lucide-react";
+} from '@chakra-ui/react';
+import { Plus, Search } from 'lucide-react';
 
 // hooks
-import { useColorMode } from "@/components/ui/color-mode";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useColorMode } from '@/components/ui/color-mode';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 export const Dashboard = () => {
   const router = useRouter();
@@ -37,11 +37,11 @@ export const Dashboard = () => {
   const { colorMode } = useColorMode();
 
   const [crosswords, setCrosswords] = useLocalStorage<Crossword[]>(
-    "crosswords",
-    []
+    'crosswords',
+    [],
   );
   const [isClient, setIsClient] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     setIsClient(true);
@@ -51,21 +51,21 @@ export const Dashboard = () => {
     if (!isClient) return;
 
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "crosswords" && e.newValue) {
+      if (e.key === 'crosswords' && e.newValue) {
         try {
           const newCrosswords = JSON.parse(e.newValue);
           setCrosswords(newCrosswords);
         } catch (error) {
-          console.error("Error syncing crosswords from localStorage:", error);
+          console.error('Error syncing crosswords from localStorage:', error);
         }
       }
     };
 
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, [isClient]);
 
-  const filteredCrosswords = crosswords.filter((crossword) => {
+  const filteredCrosswords = crosswords.filter(crossword => {
     if (!searchQuery.trim()) return true;
 
     const query = searchQuery.toLowerCase();
@@ -74,9 +74,9 @@ export const Dashboard = () => {
       crossword.title?.toLowerCase().includes(query) ||
       crossword.solution?.toLowerCase().includes(query) ||
       crossword.answers?.some(
-        (answer) =>
+        answer =>
           answer.word?.toLowerCase().includes(query) ||
-          answer.question?.toLowerCase().includes(query)
+          answer.question?.toLowerCase().includes(query),
       )
     );
   });
@@ -110,7 +110,7 @@ export const Dashboard = () => {
         <Input
           placeholder="Znajdź krzyżówkę..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={e => setSearchQuery(e.target.value)}
         />
       </InputGroup>
 
@@ -123,11 +123,11 @@ export const Dashboard = () => {
           <Center
             w={400}
             h={450}
-            bgColor={colorMode === "light" ? "gray.300" : "gray.900"}
+            bgColor={colorMode === 'light' ? 'gray.300' : 'gray.900'}
             borderRadius="20px"
             onClick={() => createNewCrossword(router)}
             cursor="pointer"
-            _hover={{ transform: "scale(1.02)", transition: "transform 0.2s" }}
+            _hover={{ transform: 'scale(1.02)', transition: 'transform 0.2s' }}
           >
             <VStack
               borderRadius={16}
@@ -135,7 +135,7 @@ export const Dashboard = () => {
               px={8}
               py={12}
               bg="teal.600"
-              _hover={{ bg: "teal.500" }}
+              _hover={{ bg: 'teal.500' }}
               transitionDuration="fast"
             >
               <Center>
@@ -148,22 +148,22 @@ export const Dashboard = () => {
           </Center>
         </GridItem>
         {sortedCrosswords.length > 0 ? (
-          sortedCrosswords.map((c) => (
+          sortedCrosswords.map(c => (
             <GridItem className="group" w={400} margin={25} key={c.id}>
               <Box
                 w={400}
                 h={450}
                 borderRadius="20px"
                 overflow="hidden"
-                bgColor={colorMode === "light" ? "gray.300" : "gray.900"}
+                bgColor={colorMode === 'light' ? 'gray.300' : 'gray.900'}
                 _hover={{
-                  transform: "scale(1.01)",
-                  transition: "transform 0.2s",
+                  transform: 'scale(1.01)',
+                  transition: 'transform 0.2s',
                 }}
               >
                 <Link
                   href={`/${c.id}`}
-                  style={{ display: "block", width: "100%", height: "100%" }}
+                  style={{ display: 'block', width: '100%', height: '100%' }}
                 >
                   <VStack w="100%" h="100%">
                     <Center m={4} flexShrink={0}>
@@ -203,7 +203,7 @@ export const Dashboard = () => {
               <Text fontSize="lg" color="gray.500">
                 {searchQuery.trim()
                   ? `Nie znaleziono krzyżówek pasujących do "${searchQuery}"`
-                  : "Brak krzyżówek"}
+                  : 'Brak krzyżówek'}
               </Text>
             </Center>
           </GridItem>

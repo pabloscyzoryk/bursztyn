@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
 // imports
-import { Box } from "@chakra-ui/react";
-import type { ReactNode } from "react";
+import { Box } from '@chakra-ui/react';
+import type { ReactNode } from 'react';
 
 type LayoutProps = {
   children: ReactNode;

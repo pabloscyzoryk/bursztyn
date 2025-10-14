@@ -30,7 +30,8 @@
     "**/*.tsx",
     "src",
     "commitlint.config.js",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "prettier.config.js"
   ],
   "exclude": ["node_modules"]
 }

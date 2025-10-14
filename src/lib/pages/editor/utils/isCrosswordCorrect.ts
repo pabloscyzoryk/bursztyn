@@ -1,8 +1,8 @@
 // imports
-import { CrosswordToSave } from "@/lib/pages/editor/utils/updateCrosswordLocalStorage";
+import { CrosswordToSave } from '@/lib/pages/editor/utils/updateCrosswordLocalStorage';
 
 const isCrosswordCorrect = (crossword: CrosswordToSave) => {
-    return true;
+  return true;
 };
 
 export default isCrosswordCorrect;

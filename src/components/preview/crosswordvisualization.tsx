@@ -1,5 +1,5 @@
-import { Answer } from "@/types/crossword";
-import { Flex, List, Text } from "@chakra-ui/react";
+import { Answer } from '@/types/crossword';
+import { Flex, List, Text } from '@chakra-ui/react';
 
 interface CrosswordVisualizationProps {
   solution: string;
@@ -33,19 +33,19 @@ export const CrosswordVisualization = ({
   spacesAfterIndexes,
 }: CrosswordVisualizationProps) => {
   const finalArr = answers.map((answer, i) => {
-    const wordLetters = (answer.word || "").split("");
-    const solutionLetter = solution[i] ?? "";
+    const wordLetters = (answer.word || '').split('');
+    const solutionLetter = solution[i] ?? '';
 
     const matchingIndexes = wordLetters
       .map((letter, index) =>
-        letter.toUpperCase() === (solutionLetter || "").toUpperCase()
+        letter.toUpperCase() === (solutionLetter || '').toUpperCase()
           ? index
-          : -1
+          : -1,
       )
-      .filter((index) => index !== -1);
+      .filter(index => index !== -1);
 
     const safeShift =
-      typeof answer.shift === "number" && answer.shift >= 0 ? answer.shift : 0;
+      typeof answer.shift === 'number' && answer.shift >= 0 ? answer.shift : 0;
     const selectedIndex =
       matchingIndexes.length > 0
         ? matchingIndexes[Math.min(safeShift, matchingIndexes.length - 1)]
@@ -64,11 +64,9 @@ export const CrosswordVisualization = ({
     };
   });
 
-  const maxLeftLength = Math.max(
-    ...finalArr.map((answer) => answer.left.length)
-  );
+  const maxLeftLength = Math.max(...finalArr.map(answer => answer.left.length));
   const maxRightLength = Math.max(
-    ...finalArr.map((answer) => answer.right.length)
+    ...finalArr.map(answer => answer.right.length),
   );
 
   const fontSize = size * 0.7;
@@ -80,7 +78,7 @@ export const CrosswordVisualization = ({
     maxHeight: `${size}px`,
     minWidth: `${size}px`,
     minHeight: `${size}px`,
-    textAlign: "center" as const,
+    textAlign: 'center' as const,
     padding: 0,
     margin: 0,
     lineHeight: 1,
@@ -97,12 +95,13 @@ export const CrosswordVisualization = ({
     ...cellStyle,
     border: `${solutionBorderThickness}px solid ${solutionBorderColor}`,
     backgroundColor: solutionsBackgroundColor,
-    fontWeight: "bold" as const,
+    fontWeight: 'bold' as const,
     fontSize: `${fontSize}px`,
   };
 
   // Oblicz całkowitą liczbę kolumn dla spójności
-  const totalColumns = maxLeftLength + (shouldShowIndexes ? 1 : 0) + 1 + maxRightLength;
+  const totalColumns =
+    maxLeftLength + (shouldShowIndexes ? 1 : 0) + 1 + maxRightLength;
 
   return (
     <Flex
@@ -127,8 +126,8 @@ export const CrosswordVisualization = ({
       <Flex w="100%" justifyContent="center" gap={4}>
         <table
           style={{
-            borderCollapse: "collapse",
-            marginTop: shouldShowQuestions ? "10px" : "0px",
+            borderCollapse: 'collapse',
+            marginTop: shouldShowQuestions ? '10px' : '0px',
           }}
         >
           <tbody>
@@ -136,11 +135,11 @@ export const CrosswordVisualization = ({
               <>
                 <tr key={`row-${rowIndex}`}>
                   {/* Lewe puste komórki */}
-                  {Array.from({ length: maxLeftLength - answer.left.length }).map(
-                    (_, index) => (
-                      <td key={`empty-left-${index}`} style={cellStyle} />
-                    )
-                  )}
+                  {Array.from({
+                    length: maxLeftLength - answer.left.length,
+                  }).map((_, index) => (
+                    <td key={`empty-left-${index}`} style={cellStyle} />
+                  ))}
 
                   {/* Komórka indeksu */}
                   {shouldShowIndexes && (
@@ -148,7 +147,7 @@ export const CrosswordVisualization = ({
                       style={{
                         ...cellStyle,
                         fontSize: `${fontSize * 0.8}px`,
-                        fontWeight: "bold",
+                        fontWeight: 'bold',
                       }}
                     >
                       {rowIndex + 1}.
@@ -157,31 +156,30 @@ export const CrosswordVisualization = ({
                   {/* Lewe litery */}
                   {answer.left.map((leftLetter, index) => (
                     <td key={`left-${index}`} style={answerCellStyle}>
-                      {shouldShowAnswers ? leftLetter : ""}
+                      {shouldShowAnswers ? leftLetter : ''}
                     </td>
                   ))}
 
-
                   {/* Komórka rozwiązania */}
                   <td style={solutionCellStyle}>
-                    {shouldShowAnswers ? answer.solutionLetter : ""}
+                    {shouldShowAnswers ? answer.solutionLetter : ''}
                   </td>
 
                   {/* Prawe litery */}
                   {answer.right.map((rightLetter, index) => (
                     <td key={`right-${index}`} style={answerCellStyle}>
-                      {shouldShowAnswers ? rightLetter : ""}
+                      {shouldShowAnswers ? rightLetter : ''}
                     </td>
                   ))}
 
                   {/* Prawe puste komórki */}
-                  {Array.from({ length: maxRightLength - answer.right.length }).map(
-                    (_, index) => (
-                      <td key={`empty-right-${index}`} style={cellStyle} />
-                    )
-                  )}
+                  {Array.from({
+                    length: maxRightLength - answer.right.length,
+                  }).map((_, index) => (
+                    <td key={`empty-right-${index}`} style={cellStyle} />
+                  ))}
                 </tr>
-                
+
                 {/* Wiersz spacji - poprawiona wersja */}
                 {spacesAfterIndexes?.includes(rowIndex) && (
                   <tr key={`space-${rowIndex}`}>
@@ -189,15 +187,13 @@ export const CrosswordVisualization = ({
                     {Array.from({ length: maxLeftLength }).map((_, index) => (
                       <td key={`space-left-${index}`} style={cellStyle} />
                     ))}
-                    
+
                     {/* Pusta komórka indeksu jeśli needed */}
-                    {shouldShowIndexes && (
-                      <td style={cellStyle} />
-                    )}
-                    
+                    {shouldShowIndexes && <td style={cellStyle} />}
+
                     {/* Komórka rozwiązania - PUSTA ale z zachowaniem stylu */}
                     <td style={solutionCellStyle}></td>
-                    
+
                     {/* Prawe puste komórki */}
                     {Array.from({ length: maxRightLength }).map((_, index) => (
                       <td key={`space-right-${index}`} style={cellStyle} />

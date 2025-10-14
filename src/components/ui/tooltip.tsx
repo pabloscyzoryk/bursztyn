@@ -42,5 +42,5 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
         </Portal>
       </ChakraTooltip.Root>
     );
-  }
+  },
 );

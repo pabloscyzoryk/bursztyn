@@ -24,13 +24,14 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       console.error(`Error reading localStorage key "${key}":`, error);
       setStoredValue(initialValue);
     }
-  }, [key, isClient]); 
+  }, [key, isClient]);
 
   const setValue = (value: T | ((val: T) => T)) => {
     if (!isClient) return;
 
     try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      const valueToStore =
+        value instanceof Function ? value(storedValue) : value;
       setStoredValue(valueToStore);
       window.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {

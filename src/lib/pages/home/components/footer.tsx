@@ -13,23 +13,23 @@ import {
   Spinner,
   Field,
   Input,
-} from "@chakra-ui/react";
-import { Button } from "@/components/ui/button";
-import { FC, FormEvent, useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { DiGithubBadge } from "react-icons/di";
-import { FaInstagram } from "react-icons/fa";
-import emailjs, { EmailJSResponseStatus } from "@emailjs/browser";
+} from '@chakra-ui/react';
+import { Button } from '@/components/ui/button';
+import { FC, FormEvent, useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import { DiGithubBadge } from 'react-icons/di';
+import { FaInstagram } from 'react-icons/fa';
+import emailjs, { EmailJSResponseStatus } from '@emailjs/browser';
 
 export const Footer = () => {
   const formRef = useRef<HTMLFormElement>(null);
   const [isPending, setIsPending] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
 
   const [hasUserStartedTyping, setHasUserStartedTyping] = useState(false);
 
@@ -41,7 +41,7 @@ export const Footer = () => {
 
   useEffect(() => {
     if (hasUserStartedTyping) {
-      setError("");
+      setError('');
       setIsSuccess(false);
       setHasUserStartedTyping(false);
     }
@@ -49,7 +49,7 @@ export const Footer = () => {
 
   useEffect(() => {
     emailjs.init({
-      publicKey: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || "",
+      publicKey: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || '',
     });
   }, []);
 
@@ -57,25 +57,25 @@ export const Footer = () => {
     e.preventDefault();
 
     if (message.length === 0) {
-      setError("Pole z wiadomością jest wymagane.");
+      setError('Pole z wiadomością jest wymagane.');
       setIsSuccess(false);
       return;
     }
 
-    setError("");
+    setError('');
     setIsPending(true);
     setIsSuccess(false);
     setHasUserStartedTyping(false);
 
     try {
       await emailjs.sendForm(
-        process.env.NEXT_PUBLIC_EMAILJS_SERVICE || "",
-        process.env.NEXT_PUBLIC_EMAILJS_FORM_TEMPLATE || "",
-        formRef.current as HTMLFormElement
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE || '',
+        process.env.NEXT_PUBLIC_EMAILJS_FORM_TEMPLATE || '',
+        formRef.current as HTMLFormElement,
       );
-      setName("");
-      setEmail("");
-      setMessage("");
+      setName('');
+      setEmail('');
+      setMessage('');
       formRef.current?.reset();
       setIsSuccess(true);
     } catch (error: unknown) {
@@ -87,7 +87,7 @@ export const Footer = () => {
       if (error instanceof EmailJSResponseStatus) {
         setError(error.text);
       } else {
-        setError("Wystąpił nieznany błąd.");
+        setError('Wystąpił nieznany błąd.');
       }
     } finally {
       setIsPending(false);
@@ -134,7 +134,7 @@ export const Footer = () => {
               <Dialog.Header>
                 <Dialog.Title>Napisz wiadomość dla autora</Dialog.Title>
               </Dialog.Header>
-              <Box ref={formRef} onSubmit={(e) => handleSubmit(e)} as="form">
+              <Box ref={formRef} onSubmit={e => handleSubmit(e)} as="form">
                 <Dialog.Body>
                   <Field.Root orientation="vertical" flex="1" minW="0">
                     <Field.Label>Imię</Field.Label>

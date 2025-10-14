@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { use, useEffect, useState } from "react";
-import { Answer, Crossword } from "@/types/crossword";
+import { useRouter } from 'next/navigation';
+import { use, useEffect, useState } from 'react';
+import { Answer, Crossword } from '@/types/crossword';
 import {
   Flex,
   VStack,
@@ -26,7 +26,7 @@ import {
   List,
   Text,
   IconButton,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react';
 import {
   Delete,
   Download,
@@ -38,11 +38,11 @@ import {
   Space,
   Sun,
   Trash2,
-} from "lucide-react";
-import updateCrosswordLocalStorage from "@/lib/pages/editor/utils/updateCrosswordLocalStorage";
-import * as htmlToImage from "html-to-image";
-import { useColorMode } from "@/components/ui/color-mode";
-import { CrosswordVisualization } from "@/components/preview/crosswordvisualization";
+} from 'lucide-react';
+import updateCrosswordLocalStorage from '@/lib/pages/editor/utils/updateCrosswordLocalStorage';
+import * as htmlToImage from 'html-to-image';
+import { useColorMode } from '@/components/ui/color-mode';
+import { CrosswordVisualization } from '@/components/preview/crosswordvisualization';
 
 interface EditorProps {
   params: Promise<{ id: string }>;
@@ -56,7 +56,7 @@ export const Editor = ({ params }: EditorProps) => {
   const { id } = use(params);
 
   const [crossword, setCrossword] = useState<Crossword | null>(null);
-  const [imgFormat, setImgFormat] = useState(["png"]);
+  const [imgFormat, setImgFormat] = useState(['png']);
   const [lastSpaceAdded, setLastSpaceAdded] = useState<number | null>(null); // Śledzi kiedy ostatnio dodano spację
 
   const setTitle = (title: string) => {
@@ -145,29 +145,29 @@ export const Editor = ({ params }: EditorProps) => {
 
   const formats = createListCollection({
     items: [
-      { label: "PNG", value: "png" },
-      { label: "JPEG", value: "jpeg" },
-      { label: "SVG", value: "svg" },
+      { label: 'PNG', value: 'png' },
+      { label: 'JPEG', value: 'jpeg' },
+      { label: 'SVG', value: 'svg' },
     ],
   });
 
   useEffect(() => {
-    const stored = localStorage.getItem("crosswords");
-    if (!stored) return router.replace("/");
+    const stored = localStorage.getItem('crosswords');
+    if (!stored) return router.replace('/');
 
     try {
       const crosswords: Crossword[] = JSON.parse(stored);
-      const found = crosswords.find((cw) => cw.id === id);
+      const found = crosswords.find(cw => cw.id === id);
 
-      if (!found) return router.replace("/");
+      if (!found) return router.replace('/');
 
       setCrossword(found);
       if (found.spacesAfterIndexes && found.spacesAfterIndexes.length > 0) {
         setLastSpaceAdded(Math.max(...found.spacesAfterIndexes));
       }
     } catch (err) {
-      console.error("Error loading crossword:", err);
-      router.replace("/");
+      console.error('Error loading crossword:', err);
+      router.replace('/');
     }
   }, [id, router]);
 
@@ -192,8 +192,8 @@ export const Editor = ({ params }: EditorProps) => {
 
     const temp = [...crossword.answers];
     temp.push({
-      question: "",
-      word: "",
+      question: '',
+      word: '',
       shift: 0,
     });
     setAnswers(temp);
@@ -223,7 +223,7 @@ export const Editor = ({ params }: EditorProps) => {
     if (temp.length > 0) {
       temp.pop();
       setSpacesAfterIndexes(temp);
-      
+
       if (temp.length > 0) {
         setLastSpaceAdded(Math.max(...temp));
       } else {
@@ -232,19 +232,21 @@ export const Editor = ({ params }: EditorProps) => {
     }
   };
 
-   const handleDeleteQuestion = (index: number) => {
+  const handleDeleteQuestion = (index: number) => {
     if (!crossword) return;
 
-    const newAnswers = crossword.answers.filter((_, answerIndex) => index !== answerIndex);
-    
+    const newAnswers = crossword.answers.filter(
+      (_, answerIndex) => index !== answerIndex,
+    );
+
     const updatedSpaces = crossword.spacesAfterIndexes
       .filter(spaceIndex => spaceIndex !== index)
-      .map(spaceIndex => spaceIndex > index ? spaceIndex - 1 : spaceIndex);
+      .map(spaceIndex => (spaceIndex > index ? spaceIndex - 1 : spaceIndex));
 
     setCrossword({
       ...crossword,
       answers: newAnswers,
-      spacesAfterIndexes: updatedSpaces
+      spacesAfterIndexes: updatedSpaces,
     });
 
     if (updatedSpaces.length > 0) {
@@ -254,7 +256,7 @@ export const Editor = ({ params }: EditorProps) => {
     }
   };
   const handleDeleteProject = () => {
-    const crosswordsLC = localStorage.getItem("crosswords");
+    const crosswordsLC = localStorage.getItem('crosswords');
 
     if (!crosswordsLC || !crossword) {
       return;
@@ -262,9 +264,9 @@ export const Editor = ({ params }: EditorProps) => {
 
     const parsed: Crossword[] = JSON.parse(crosswordsLC);
     const filtered = parsed.filter((cw: Crossword) => cw.id !== crossword.id);
-    localStorage.setItem("crosswords", JSON.stringify(filtered));
+    localStorage.setItem('crosswords', JSON.stringify(filtered));
 
-    router.replace("/");
+    router.replace('/');
   };
 
   const shouldShowShiftButtons = (index: number): boolean => {
@@ -276,10 +278,10 @@ export const Editor = ({ params }: EditorProps) => {
     if (!solutionLetter) return false;
     if (!answer?.word) return false;
 
-    const wordLetters = answer.word.split("");
+    const wordLetters = answer.word.split('');
     const matchingIndexes = wordLetters
       .map((l, i) => (l.toUpperCase() === solutionLetter ? i : -1))
-      .filter((i) => i !== -1);
+      .filter(i => i !== -1);
 
     return matchingIndexes.length > 1;
   };
@@ -295,9 +297,9 @@ export const Editor = ({ params }: EditorProps) => {
     if (!currentAnswer.word) return;
 
     const positions: number[] = currentAnswer.word
-      .split("")
+      .split('')
       .map((l, i) => (l.toUpperCase() === solutionLetter ? i : -1))
-      .filter((i) => i !== -1);
+      .filter(i => i !== -1);
 
     if (positions.length <= 1) {
       return;
@@ -305,7 +307,7 @@ export const Editor = ({ params }: EditorProps) => {
 
     const maxShift = positions.length - 1;
     const currentShift =
-      typeof currentAnswer.shift === "number" ? currentAnswer.shift : 0;
+      typeof currentAnswer.shift === 'number' ? currentAnswer.shift : 0;
     let newShift = currentShift + amount;
 
     if (newShift > maxShift) newShift = 0;
@@ -320,7 +322,7 @@ export const Editor = ({ params }: EditorProps) => {
   };
 
   const handleDownload = async () => {
-    const node = document.getElementById("crossword-canvas");
+    const node = document.getElementById('crossword-canvas');
     if (!node) {
       console.error("Element 'crossword-canvas' nie został znaleziony");
       return;
@@ -328,76 +330,76 @@ export const Editor = ({ params }: EditorProps) => {
 
     const clone = node.cloneNode(true) as HTMLElement;
 
-    clone.style.position = "fixed";
-    clone.style.left = "0";
-    clone.style.top = "0";
-    clone.style.overflow = "visible";
-    clone.style.width = "auto";
-    clone.style.height = "auto";
-    clone.style.maxWidth = "none";
-    clone.style.maxHeight = "none";
-    clone.style.minWidth = "none";
-    clone.style.minHeight = "none";
-    clone.style.zIndex = "9999";
-    clone.style.visibility = "visible";
-    clone.style.opacity = "1";
+    clone.style.position = 'fixed';
+    clone.style.left = '0';
+    clone.style.top = '0';
+    clone.style.overflow = 'visible';
+    clone.style.width = 'auto';
+    clone.style.height = 'auto';
+    clone.style.maxWidth = 'none';
+    clone.style.maxHeight = 'none';
+    clone.style.minWidth = 'none';
+    clone.style.minHeight = 'none';
+    clone.style.zIndex = '9999';
+    clone.style.visibility = 'visible';
+    clone.style.opacity = '1';
 
     const originalDisplay = node.style.display;
-    node.style.display = "none";
+    node.style.display = 'none';
 
     document.body.appendChild(clone);
 
     const format = imgFormat[0];
-    const isJpeg = format === "jpeg";
+    const isJpeg = format === 'jpeg';
 
     const options = {
       pixelRatio: 2,
       cacheBust: true,
       backgroundColor: isJpeg
-        ? colorMode === "dark"
-          ? "000000"
-          : "ffffff"
+        ? colorMode === 'dark'
+          ? '000000'
+          : 'ffffff'
         : undefined,
       quality: 1,
       useCORS: true,
       style: {
-        transform: "none",
-        overflow: "visible",
+        transform: 'none',
+        overflow: 'visible',
       },
     };
 
     try {
       let dataUrl;
-      console.log("Rozpoczynanie renderowania format:", format);
+      console.log('Rozpoczynanie renderowania format:', format);
 
       // Dodaj krótki timeout aby zapewnić renderowanie
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 100));
 
-      if (format === "png") {
+      if (format === 'png') {
         dataUrl = await htmlToImage.toPng(clone, options);
-      } else if (format === "jpeg") {
+      } else if (format === 'jpeg') {
         dataUrl = await htmlToImage.toJpeg(clone, options);
-      } else if (format === "svg") {
+      } else if (format === 'svg') {
         dataUrl = await htmlToImage.toSvg(clone, options);
       } else {
         dataUrl = await htmlToImage.toPng(clone, options);
       }
 
-      if (!dataUrl || dataUrl === "data:,") {
-        throw new Error("Puste dane obrazu");
+      if (!dataUrl || dataUrl === 'data:,') {
+        throw new Error('Puste dane obrazu');
       }
 
-      console.log("Renderowanie zakończone, tworzenie linku pobierania");
+      console.log('Renderowanie zakończone, tworzenie linku pobierania');
 
-      const link = document.createElement("a");
-      link.download = `${crossword?.title || "crossword"}.${format}`;
+      const link = document.createElement('a');
+      link.download = `${crossword?.title || 'crossword'}.${format}`;
       link.href = dataUrl;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } catch (err) {
-      console.error("Błąd podczas renderowania obrazu:", err);
-      alert("Wystąpił błąd podczas generowania obrazu. Spróbuj ponownie.");
+      console.error('Błąd podczas renderowania obrazu:', err);
+      alert('Wystąpił błąd podczas generowania obrazu. Spróbuj ponownie.');
     } finally {
       node.style.display = originalDisplay;
       if (document.body.contains(clone)) {
@@ -407,7 +409,7 @@ export const Editor = ({ params }: EditorProps) => {
   };
 
   const handlePrint = () => {
-    const crosswordElement = document.getElementById("crossword-canvas");
+    const crosswordElement = document.getElementById('crossword-canvas');
 
     if (!crosswordElement) {
       console.error("Element 'crossword-canvas' nie został znaleziony");
@@ -415,17 +417,17 @@ export const Editor = ({ params }: EditorProps) => {
     }
 
     const titleElement = crosswordElement.querySelector(
-      "#crossword-title-canvas"
+      '#crossword-title-canvas',
     );
 
     if (titleElement) {
       titleElement.remove();
     }
 
-    const printWindow = window.open("", "_blank", "width=800,height=600");
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
 
     if (!printWindow) {
-      alert("Proszę zezwolić na wyskakujące okna dla tej strony");
+      alert('Proszę zezwolić na wyskakujące okna dla tej strony');
       return;
     }
 
@@ -510,11 +512,11 @@ export const Editor = ({ params }: EditorProps) => {
     >
       <VStack p={12}>
         <Flex gap={2} mb={2} justifyContent="left" w="100%">
-          <IconButton onClick={() => router.replace("/")} size="md">
+          <IconButton onClick={() => router.replace('/')} size="md">
             <Home />
           </IconButton>
           <IconButton onClick={toggleColorMode} size="md">
-            {colorMode === "light" ? <Sun /> : <Moon />}
+            {colorMode === 'light' ? <Sun /> : <Moon />}
           </IconButton>
         </Flex>
 
@@ -523,7 +525,7 @@ export const Editor = ({ params }: EditorProps) => {
           <Input
             placeholder="Zagadki o bursztynie"
             flex="1"
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={e => setTitle(e.target.value)}
             value={crossword.title}
             type="text"
             width={60}
@@ -536,7 +538,7 @@ export const Editor = ({ params }: EditorProps) => {
           <Input
             placeholder="Bursztyn"
             flex="1"
-            onChange={(e) => setSolution(e.target.value)}
+            onChange={e => setSolution(e.target.value)}
             value={crossword.solution}
             type="text"
             width={60}
@@ -556,11 +558,15 @@ export const Editor = ({ params }: EditorProps) => {
             mt={-4}
           >
             <Field.Root mt={5} orientation="vertical" flex="1" minW="0">
-              <Field.Label>Pytanie nr {index + 1}{crossword.solution[index] && `, litera: ${crossword.solution[index]}`}</Field.Label>
+              <Field.Label>
+                Pytanie nr {index + 1}
+                {crossword.solution[index] &&
+                  `, litera: ${crossword.solution[index]}`}
+              </Field.Label>
               <Textarea
                 placeholder="Treść pytania"
                 flex="1"
-                onChange={(e) => updateAnswers(index, e.target.value)}
+                onChange={e => updateAnswers(index, e.target.value)}
                 value={crossword.answers[index].question}
                 fontSize={16}
                 size="xs"
@@ -573,7 +579,7 @@ export const Editor = ({ params }: EditorProps) => {
               <Input
                 placeholder="Słowo"
                 flex="1"
-                onChange={(e) => handleUpdateWords(index, e.target.value)}
+                onChange={e => handleUpdateWords(index, e.target.value)}
                 value={crossword.answers[index].word}
                 type="text"
                 fontSize={16}
@@ -594,8 +600,8 @@ export const Editor = ({ params }: EditorProps) => {
                     opacity={0}
                     visibility="hidden"
                     _groupHover={{
-                      opacity: "1",
-                      visibility: "visible",
+                      opacity: '1',
+                      visibility: 'visible',
                     }}
                     transition="opacity 0.3s ease-in-out"
                     bg="transparent"
@@ -610,8 +616,8 @@ export const Editor = ({ params }: EditorProps) => {
                     opacity={0}
                     visibility="hidden"
                     _groupHover={{
-                      opacity: "1",
-                      visibility: "visible",
+                      opacity: '1',
+                      visibility: 'visible',
                     }}
                     transition="opacity 0.3s ease-in-out"
                     bg="transparent"
@@ -635,8 +641,8 @@ export const Editor = ({ params }: EditorProps) => {
               opacity={0}
               visibility="hidden"
               _groupHover={{
-                opacity: "1",
-                visibility: "visible",
+                opacity: '1',
+                visibility: 'visible',
               }}
               mt={7}
               transition="opacity 0.3s ease-in-out"
@@ -731,7 +737,7 @@ export const Editor = ({ params }: EditorProps) => {
             <ColorPicker.Root
               defaultValue={parseColor(crossword.solutionsBackgroundColor)}
               maxW="200px"
-              onValueChange={(e) => {
+              onValueChange={e => {
                 setSolutionsBackgroundColor(e.valueAsString);
               }}
             >
@@ -757,7 +763,7 @@ export const Editor = ({ params }: EditorProps) => {
             <ColorPicker.Root
               defaultValue={parseColor(crossword.solutionBorderColor)}
               maxW="200px"
-              onValueChange={(e) => {
+              onValueChange={e => {
                 setSolutionBorderColor(e.valueAsString);
               }}
             >
@@ -783,7 +789,7 @@ export const Editor = ({ params }: EditorProps) => {
             <ColorPicker.Root
               defaultValue={parseColor(crossword.answersBackgroundColor)}
               maxW="200px"
-              onValueChange={(e) => {
+              onValueChange={e => {
                 setAnswersBackgroundColor(e.valueAsString);
               }}
             >
@@ -809,7 +815,7 @@ export const Editor = ({ params }: EditorProps) => {
             <ColorPicker.Root
               defaultValue={parseColor(crossword.answersBorderColor)}
               maxW="200px"
-              onValueChange={(e) => {
+              onValueChange={e => {
                 setAnswersBorderColor(e.valueAsString);
               }}
             >
@@ -837,7 +843,7 @@ export const Editor = ({ params }: EditorProps) => {
             <Field.Root>
               <Field.Label>Wielkość krzyżówki</Field.Label>
               <NumberInput.Root
-                onValueChange={(e) => setSize(e.valueAsNumber)}
+                onValueChange={e => setSize(e.valueAsNumber)}
                 value={String(crossword.size)}
                 min={0}
                 width="200px"
@@ -850,9 +856,7 @@ export const Editor = ({ params }: EditorProps) => {
             <Field.Root>
               <Field.Label>Grubość ramki rozwiązania</Field.Label>
               <NumberInput.Root
-                onValueChange={(e) =>
-                  setSolutionBorderThickness(e.valueAsNumber)
-                }
+                onValueChange={e => setSolutionBorderThickness(e.valueAsNumber)}
                 value={String(crossword.solutionBorderThickness)}
                 min={0}
                 width="200px"
@@ -865,9 +869,7 @@ export const Editor = ({ params }: EditorProps) => {
             <Field.Root>
               <Field.Label>Grubość ramki odpowiedzi</Field.Label>
               <NumberInput.Root
-                onValueChange={(e) =>
-                  setAnswersBorderThickness(e.valueAsNumber)
-                }
+                onValueChange={e => setAnswersBorderThickness(e.valueAsNumber)}
                 value={String(crossword.answersBorderThickness)}
                 min={0}
                 width="200px"
@@ -881,7 +883,7 @@ export const Editor = ({ params }: EditorProps) => {
           <Flex direction="column" gap={4} mt={7}>
             <Checkbox.Root
               checked={crossword.shouldShowQuestions}
-              onCheckedChange={(e) => setShouldShowQuestions(!!e.checked)}
+              onCheckedChange={e => setShouldShowQuestions(!!e.checked)}
             >
               <Checkbox.HiddenInput />
               <Checkbox.Control />
@@ -889,7 +891,7 @@ export const Editor = ({ params }: EditorProps) => {
             </Checkbox.Root>
             <Checkbox.Root
               checked={crossword.shouldShowAnswers}
-              onCheckedChange={(e) => setShouldShowAnswers(!!e.checked)}
+              onCheckedChange={e => setShouldShowAnswers(!!e.checked)}
             >
               <Checkbox.HiddenInput />
               <Checkbox.Control />
@@ -898,7 +900,7 @@ export const Editor = ({ params }: EditorProps) => {
 
             <Checkbox.Root
               checked={crossword.shouldShowIndexes}
-              onCheckedChange={(e) => setShouldShowIndexes(!!e.checked)}
+              onCheckedChange={e => setShouldShowIndexes(!!e.checked)}
             >
               <Checkbox.HiddenInput />
               <Checkbox.Control />
@@ -913,11 +915,11 @@ export const Editor = ({ params }: EditorProps) => {
                 </Icon>
               </Button>
               <Select.Root
-                defaultValue={["png"]}
+                defaultValue={['png']}
                 collection={formats}
                 size="sm"
                 width={20}
-                onValueChange={(e) => setImgFormat(e.value)}
+                onValueChange={e => setImgFormat(e.value)}
                 value={imgFormat}
               >
                 <Select.HiddenSelect />
@@ -932,7 +934,7 @@ export const Editor = ({ params }: EditorProps) => {
                 <Portal>
                   <Select.Positioner>
                     <Select.Content>
-                      {formats.items.map((format) => (
+                      {formats.items.map(format => (
                         <Select.Item item={format} key={format.value}>
                           {format.label}
                           <Select.ItemIndicator />
