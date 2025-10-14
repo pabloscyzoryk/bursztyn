@@ -1,11 +1,13 @@
 'use client';
 // imports
 
-// components
+// ui
+import { VStack } from '@chakra-ui/react';
+
+// pages
 import { Heading } from '@/lib/pages/home/components/heading';
 import { Dashboard } from '@/lib/pages/home/components/dashboard';
 import { Footer } from '@/lib/pages/home/components/footer';
-import { VStack } from '@chakra-ui/react';
 
 export const Home = () => {
   return (

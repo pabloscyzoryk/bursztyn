@@ -1,7 +1,8 @@
 // imports
-import { Crossword } from '@/types/crossword';
-import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
-import { FaSlideshare } from 'react-icons/fa';
+
+// types
+import { type Crossword } from '@/types/crossword';
+import { type AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
 const createNewCrossword = (router: AppRouterInstance) => {
   const id = crypto.randomUUID();

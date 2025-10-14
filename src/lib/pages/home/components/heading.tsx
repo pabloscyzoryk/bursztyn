@@ -1,17 +1,21 @@
 // imports
-
-// chakra-ui
-import { HStack, Heading as Title, Icon, IconButton } from '@chakra-ui/react';
-import { Button } from '@/components/ui/button';
-import createNewCrossword from '@/lib/pages/home/utils/createNewCrossword';
 import { useRouter } from 'next/navigation';
-import { Moon, Plus, Sun } from 'lucide-react';
-import { useColorMode } from '@/components/ui/color-mode';
+import { ColorModeIcon, useColorMode } from '@/components/ui/color-mode';
+
+// ui
+import { HStack, Heading as Title, Icon, IconButton } from '@chakra-ui/react';
+import { Plus } from 'lucide-react';
+
+// components
+import { Button } from '@/components/ui/button';
+
+// utils
+import createNewCrossword from '@/lib/pages/home/utils/createNewCrossword';
 
 export const Heading = () => {
   const router = useRouter();
 
-  const { toggleColorMode, colorMode } = useColorMode();
+  const { toggleColorMode } = useColorMode();
 
   return (
     <HStack marginY={8}>
@@ -37,7 +41,7 @@ export const Heading = () => {
         onClick={toggleColorMode}
         size="md"
       >
-        {colorMode === 'light' ? <Sun /> : <Moon />}
+        <ColorModeIcon />
       </IconButton>
     </HStack>
   );

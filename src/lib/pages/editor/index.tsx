@@ -1,8 +1,13 @@
 'use client';
 
+// imports
 import { useRouter } from 'next/navigation';
 import { use, useEffect, useState } from 'react';
-import { Answer, Crossword } from '@/types/crossword';
+
+// types
+import { type Answer, type Crossword } from '@/types/crossword';
+
+// ui
 import {
   Flex,
   VStack,
@@ -23,10 +28,10 @@ import {
   Dialog,
   CloseButton,
   Box,
-  List,
   Text,
   IconButton,
 } from '@chakra-ui/react';
+
 import {
   Delete,
   Download,
@@ -39,10 +44,17 @@ import {
   Sun,
   Trash2,
 } from 'lucide-react';
+
+// hooks
 import updateCrosswordLocalStorage from '@/lib/pages/editor/utils/updateCrosswordLocalStorage';
-import * as htmlToImage from 'html-to-image';
 import { useColorMode } from '@/components/ui/color-mode';
+
+// components
 import { CrosswordVisualization } from '@/components/preview/crosswordvisualization';
+import { ColorModeIcon } from '@/components/ui/color-mode';
+
+// libs
+import * as htmlToImage from 'html-to-image';
 
 interface EditorProps {
   params: Promise<{ id: string }>;
@@ -516,7 +528,7 @@ export const Editor = ({ params }: EditorProps) => {
             <Home />
           </IconButton>
           <IconButton onClick={toggleColorMode} size="md">
-            {colorMode === 'light' ? <Sun /> : <Moon />}
+            <ColorModeIcon />
           </IconButton>
         </Flex>
 

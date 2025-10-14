@@ -1,4 +1,5 @@
 // imports
+import { useEffect, useRef, useState } from 'react';
 
 // ui
 import {
@@ -14,11 +15,17 @@ import {
   Field,
   Input,
 } from '@chakra-ui/react';
-import { Button } from '@/components/ui/button';
-import { FC, FormEvent, useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
 import { DiGithubBadge } from 'react-icons/di';
 import { FaInstagram } from 'react-icons/fa';
+
+// types
+import { type FormEvent } from 'react';
+
+// components
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+
+// libs
 import emailjs, { EmailJSResponseStatus } from '@emailjs/browser';
 
 export const Footer = () => {

@@ -1,5 +1,10 @@
+// imports
+
+// types
 import { Answer } from '@/types/crossword';
-import { Flex, List, Text } from '@chakra-ui/react';
+
+// ui
+import { Flex, List } from '@chakra-ui/react';
 
 interface CrosswordVisualizationProps {
   solution: string;
@@ -99,10 +104,6 @@ export const CrosswordVisualization = ({
     fontSize: `${fontSize}px`,
   };
 
-  // Oblicz całkowitą liczbę kolumn dla spójności
-  const totalColumns =
-    maxLeftLength + (shouldShowIndexes ? 1 : 0) + 1 + maxRightLength;
-
   return (
     <Flex
       justifyContent="flex-start"
@@ -141,7 +142,7 @@ export const CrosswordVisualization = ({
                     <td key={`empty-left-${index}`} style={cellStyle} />
                   ))}
 
-                  {/* Komórka indeksu */}
+                  {/* Komórka numeracji */}
                   {shouldShowIndexes && (
                     <td
                       style={{
@@ -180,7 +181,7 @@ export const CrosswordVisualization = ({
                   ))}
                 </tr>
 
-                {/* Wiersz spacji - poprawiona wersja */}
+                {/* Wiersz spacji */}
                 {spacesAfterIndexes?.includes(rowIndex) && (
                   <tr key={`space-${rowIndex}`}>
                     {/* Lewe puste komórki */}
@@ -188,10 +189,10 @@ export const CrosswordVisualization = ({
                       <td key={`space-left-${index}`} style={cellStyle} />
                     ))}
 
-                    {/* Pusta komórka indeksu jeśli needed */}
+                    {/* Pusta komórka indeksu jeśli potrzebna */}
                     {shouldShowIndexes && <td style={cellStyle} />}
 
-                    {/* Komórka rozwiązania - PUSTA ale z zachowaniem stylu */}
+                    {/* Pusta komórka rozwiązania */}
                     <td style={solutionCellStyle}></td>
 
                     {/* Prawe puste komórki */}

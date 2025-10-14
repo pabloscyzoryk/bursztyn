@@ -1,6 +1,8 @@
 // imports
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+
+// utils
 import createNewCrossword from '@/lib/pages/home/utils/createNewCrossword';
 
 // types
@@ -20,9 +22,7 @@ import {
   Icon,
   Flex,
   Box,
-  Button,
   InputGroup,
-  Kbd,
   Input,
 } from '@chakra-ui/react';
 import { Plus, Search } from 'lucide-react';

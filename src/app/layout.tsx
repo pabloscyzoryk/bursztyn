@@ -2,7 +2,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Layout } from '@/lib/layout';
 
-// chakra - ui
+// components
 import { Provider } from '@/components/ui/provider';
 
 type RootLayoutProps = {
