@@ -189,6 +189,7 @@ export const Dashboard = () => {
                         size={20}
                         shouldShowAnswers={true}
                         shouldShowQuestions={false}
+                        spacesAfterIndexes={c.spacesAfterIndexes}
                       />
                     </Flex>
                   </VStack>
