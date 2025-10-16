@@ -14,10 +14,7 @@ import {
   Button,
   Spinner,
 } from '@chakra-ui/react';
-import {
-  Download,
-  Printer,
-} from 'lucide-react';
+import { Download, Play, Printer, Settings } from 'lucide-react';
 
 // utils
 import { updateCrosswordLocalStorage } from '@/lib/pages/editor/utils/updateCrosswordLocalStorage';
@@ -37,6 +34,7 @@ import { DisplaySettings } from '@/lib/pages/editor/components/displaySettings';
 import { SizeSettings } from '@/lib/pages/editor/components/sizeSettings';
 import { ColorSettings } from '@/lib/pages/editor/components/colorSettings';
 import { ProjectSettings } from '@/lib/pages/editor/components/projectSettings';
+import { Tooltip } from '@/components/ui/tooltip';
 
 // libs
 import * as htmlToImage from 'html-to-image';
@@ -240,8 +238,11 @@ export const Editor = ({ params }: EditorProps) => {
 
   if (!crossword) {
     return (
-      <Flex justifyContent="center" alignItems="center" w="100vw" h="100vh">
-        <Text><Spinner /> Ładowanie krzyżówki...</Text>
+      <Flex justifyContent="center" alignItems="center" w="100vw" minH="100vh">
+        <Flex justifyContent="center" alignItems="center" gap={4} h={16}>
+          <Spinner />
+          <Text>Ładowanie krzyżówki...</Text>
+        </Flex>
       </Flex>
     );
   }
@@ -338,6 +339,28 @@ export const Editor = ({ params }: EditorProps) => {
                 <Printer />
               </Icon>
             </Button>
+
+            {process.env.NEXT_PUBLIC_IS_DEV && (
+              <>
+                <Button disabled onClick={handlePrint} colorPalette="gray">
+                  Ustawienia dostępu
+                  <Icon>
+                    <Settings />
+                  </Icon>
+                </Button>
+
+                <Button
+                  disabled={true}
+                  onClick={handlePrint}
+                  colorPalette="green"
+                >
+                  Rozwiąż krzyżówkę
+                  <Icon>
+                    <Play />
+                  </Icon>
+                </Button>
+              </>
+            )}
 
             <DeleteProjectDialog
               crossword={crossword}
