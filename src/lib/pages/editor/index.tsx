@@ -12,6 +12,7 @@ import {
   createListCollection,
   Text,
   Button,
+  Spinner,
 } from '@chakra-ui/react';
 import {
   Download,
@@ -240,7 +241,7 @@ export const Editor = ({ params }: EditorProps) => {
   if (!crossword) {
     return (
       <Flex justifyContent="center" alignItems="center" w="100vw" h="100vh">
-        <Text>Ładowanie krzyżówki...</Text>
+        <Text><Spinner /> Ładowanie krzyżówki...</Text>
       </Flex>
     );
   }
