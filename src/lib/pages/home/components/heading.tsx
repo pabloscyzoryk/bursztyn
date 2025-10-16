@@ -10,7 +10,7 @@ import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 // utils
-import createNewCrossword from '@/lib/pages/home/utils/createNewCrossword';
+import { createNewCrossword } from '@/lib/pages/home/utils/createNewCrossword';
 
 export const Heading = () => {
   const router = useRouter();
