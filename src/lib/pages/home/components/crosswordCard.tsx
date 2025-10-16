@@ -1,23 +1,48 @@
 // imports
 
 // types
-import { type Crossword } from "@/types/crossword";
+import { type Crossword } from '@/types/crossword';
 
 // ui
-import { GridItem, Box, VStack, Center, Text, Flex } from "@chakra-ui/react"; 
+import {
+  GridItem,
+  Box,
+  VStack,
+  Center,
+  Text,
+  Flex,
+  Button,
+  IconButton,
+  Icon,
+} from '@chakra-ui/react';
 
 // hooks
-import { useColorMode } from "@/components/ui/color-mode";
+import { useColorMode } from '@/components/ui/color-mode';
 
 // components
-import { CrosswordVisualization } from "@/components/preview/crosswordvisualization";
-import Link from "next/link";
+import { CrosswordVisualization } from '@/components/preview/crosswordvisualization';
+import Link from 'next/link';
+import { Edit, Play } from 'lucide-react';
+import { Tooltip } from '@/components/ui/tooltip';
+import { useRouter } from 'next/navigation';
 
 export const CrosswordCard = ({ crossword }: { crossword: Crossword }) => {
   const { colorMode } = useColorMode();
 
+  const router = useRouter();
+
+  const handleEditCrossword = () => {
+    router.replace(`/${crossword.id}`);
+  };
+
   return (
-    <GridItem className="group" w={400} margin={25} key={crossword.id}>
+    <GridItem
+      className="group"
+      w={400}
+      margin={25}
+      key={crossword.id}
+      position="relative"
+    >
       <Box
         w={400}
         h={450}
@@ -63,6 +88,41 @@ export const CrosswordCard = ({ crossword }: { crossword: Crossword }) => {
           </VStack>
         </Link>
       </Box>
+      <Flex gap={2} position="absolute" top={385} right="22px">
+        <Tooltip
+          positioning={{ placement: 'top' }}
+          showArrow
+          content="Edytuj tę krzyżówkę"
+        >
+          <Button
+            onClick={handleEditCrossword}
+            _groupHover={{ opacity: 1 }}
+            opacity={0}
+            colorPalette="gray"
+          >
+            <Icon>
+              <Edit />
+            </Icon>
+          </Button>
+        </Tooltip>
+        {process.env.NEXT_PUBLIC_IS_DEV &&
+          <Tooltip
+            positioning={{ placement: 'top' }}
+            showArrow
+            content="Rozwiąż tę krzyżówkę"
+          >
+            <Button
+              _groupHover={{ opacity: 1 }}
+              opacity={0}
+              colorPalette="green"
+            >
+              <Icon>
+                <Play />
+              </Icon>
+            </Button>
+          </Tooltip>
+        }
+      </Flex>
     </GridItem>
   );
 };
