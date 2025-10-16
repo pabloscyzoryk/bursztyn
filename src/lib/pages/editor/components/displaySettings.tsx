@@ -31,7 +31,7 @@ export const DisplaySettings = ({
   ];
 
   return (
-    <Flex direction="column" gap={4} mt={7}>
+    <Flex direction="column" gap={4}>
       {displaySettings.map((setting, index) => (
         <Checkbox.Root
           key={index}
