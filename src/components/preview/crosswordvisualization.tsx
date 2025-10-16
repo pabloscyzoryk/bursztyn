@@ -20,6 +20,7 @@ interface CrosswordVisualizationProps {
   shouldShowQuestions: boolean;
   size: number;
   spacesAfterIndexes: number[];
+  isPlayMode?: boolean,
 }
 
 export const CrosswordVisualization = ({
@@ -36,6 +37,7 @@ export const CrosswordVisualization = ({
   shouldShowQuestions,
   size,
   spacesAfterIndexes,
+  isPlayMode,
 }: CrosswordVisualizationProps) => {
   const finalArr = answers.map((answer, i) => {
     const wordLetters = (answer.word || '').split('');
@@ -168,7 +170,7 @@ export const CrosswordVisualization = ({
 
                   {/* Prawe litery */}
                   {answer.right.map((rightLetter, index) => (
-                    <td key={`right-${index}`} style={answerCellStyle}>
+                    <td contentEditable key={`right-${index}`} style={answerCellStyle}>
                       {shouldShowAnswers ? rightLetter : ''}
                     </td>
                   ))}

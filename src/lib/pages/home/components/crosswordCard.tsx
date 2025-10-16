@@ -59,7 +59,7 @@ export const CrosswordCard = ({ crossword }: { crossword: Crossword }) => {
         }}
       >
         <Link
-          href={`/${crossword.id}`}
+          href={`/edit/${crossword.id}`}
           style={{ display: 'block', width: '100%', height: '100%' }}
         >
           <VStack w="100%" h="100%">

@@ -2,17 +2,19 @@
 
 import { useRouter } from 'next/navigation';
 import { use, useEffect, useState } from 'react';
+
+// types 
 import { type Crossword } from '@/types/crossword';
+
+// ui
 import {
   Flex,
   VStack,
   Icon,
   Portal,
   Select,
-  createListCollection,
-  Text,
   Button,
-  Spinner,
+  createListCollection,
 } from '@chakra-ui/react';
 import { Download, Play, Printer, Settings } from 'lucide-react';
 
@@ -37,6 +39,7 @@ import { ProjectSettings } from '@/lib/pages/editor/components/projectSettings';
 
 // libs
 import * as htmlToImage from 'html-to-image';
+import { LoadingState } from '@/lib/pages/editor/components/loadingState';
 
 interface EditorProps {
   params: Promise<{ id: string }>;
@@ -236,14 +239,7 @@ export const Editor = ({ params }: EditorProps) => {
   }, [crossword]);
 
   if (!crossword) {
-    return (
-      <Flex justifyContent="center" alignItems="center" w="100vw" minH="100vh">
-        <Flex justifyContent="center" alignItems="center" gap={4} h={16}>
-          <Spinner />
-          <Text>Ładowanie krzyżówki...</Text>
-        </Flex>
-      </Flex>
-    );
+    return <LoadingState />
   }
 
   return (
