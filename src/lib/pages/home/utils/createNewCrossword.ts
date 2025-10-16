@@ -34,5 +34,5 @@ export const createNewCrossword = (router: AppRouterInstance) => {
     spacesAfterIndexes: [],
   });
   localStorage.setItem('crosswords', JSON.stringify(crosswords));
-  router.replace(`/${id}`);
+  router.replace(`/edit/${id}`);
 };

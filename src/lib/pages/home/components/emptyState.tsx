@@ -1,7 +1,7 @@
 // imports
 
 // ui
-import { Center, GridItem, Text } from '@chakra-ui/react'; 
+import { Center, GridItem, Text } from '@chakra-ui/react';
 
 export const EmptyState = ({ searchQuery }: { searchQuery: string }) => (
   <GridItem colSpan={3}>

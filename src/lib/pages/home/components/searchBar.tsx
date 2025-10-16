@@ -1,10 +1,13 @@
 // imports
 
 // ui
-import { InputGroup, Input } from "@chakra-ui/react";
-import { Search } from "lucide-react";
+import { InputGroup, Input } from '@chakra-ui/react';
+import { Search } from 'lucide-react';
 
-export const SearchBar = ({ searchQuery, setSearchQuery }: {
+export const SearchBar = ({
+  searchQuery,
+  setSearchQuery,
+}: {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
 }) => (

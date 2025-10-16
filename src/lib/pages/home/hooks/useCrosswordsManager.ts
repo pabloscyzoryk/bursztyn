@@ -1,11 +1,11 @@
 // imports
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 // types
-import { Crossword } from "@/types/crossword";
+import { Crossword } from '@/types/crossword';
 
 // hooks
-import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 export const useCrosswordsManager = () => {
   const [crosswords, setCrosswords] = useLocalStorage<Crossword[]>(

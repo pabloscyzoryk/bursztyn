@@ -34,7 +34,6 @@ import { DisplaySettings } from '@/lib/pages/editor/components/displaySettings';
 import { SizeSettings } from '@/lib/pages/editor/components/sizeSettings';
 import { ColorSettings } from '@/lib/pages/editor/components/colorSettings';
 import { ProjectSettings } from '@/lib/pages/editor/components/projectSettings';
-import { Tooltip } from '@/components/ui/tooltip';
 
 // libs
 import * as htmlToImage from 'html-to-image';

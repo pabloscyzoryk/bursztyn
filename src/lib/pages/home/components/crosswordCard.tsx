@@ -32,7 +32,11 @@ export const CrosswordCard = ({ crossword }: { crossword: Crossword }) => {
   const router = useRouter();
 
   const handleEditCrossword = () => {
-    router.replace(`/${crossword.id}`);
+    router.replace(`/edit/${crossword.id}`);
+  };
+
+  const handlePlayCrossword = () => {
+    router.replace(`/play/${crossword.id}`);
   };
 
   return (
@@ -105,13 +109,14 @@ export const CrosswordCard = ({ crossword }: { crossword: Crossword }) => {
             </Icon>
           </Button>
         </Tooltip>
-        {process.env.NEXT_PUBLIC_IS_DEV &&
+        {process.env.NEXT_PUBLIC_IS_DEV && (
           <Tooltip
             positioning={{ placement: 'top' }}
             showArrow
             content="Rozwiąż tę krzyżówkę"
           >
             <Button
+              onClick={handlePlayCrossword}
               _groupHover={{ opacity: 1 }}
               opacity={0}
               colorPalette="green"
@@ -121,7 +126,7 @@ export const CrosswordCard = ({ crossword }: { crossword: Crossword }) => {
               </Icon>
             </Button>
           </Tooltip>
-        }
+        )}
       </Flex>
     </GridItem>
   );

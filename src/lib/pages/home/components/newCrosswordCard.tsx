@@ -1,17 +1,21 @@
 // imports
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation';
 
 // hooks
-import { useColorMode } from "@/components/ui/color-mode";
+import { useColorMode } from '@/components/ui/color-mode';
 
 // utils
-import { createNewCrossword } from "@/lib/pages/home/utils/createNewCrossword";
+import { createNewCrossword } from '@/lib/pages/home/utils/createNewCrossword';
 
 // ui
-import { GridItem, Center, VStack, Text, Icon } from "@chakra-ui/react";
-import { Plus } from "lucide-react";
+import { GridItem, Center, VStack, Text, Icon } from '@chakra-ui/react';
+import { Plus } from 'lucide-react';
 
-export const NewCrosswordCard = ({ router }: { router: ReturnType<typeof useRouter> }) => {
+export const NewCrosswordCard = ({
+  router,
+}: {
+  router: ReturnType<typeof useRouter>;
+}) => {
   const { colorMode } = useColorMode();
 
   return (

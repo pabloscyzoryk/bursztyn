@@ -2,10 +2,7 @@
 import { useRouter } from 'next/navigation';
 
 // ui
-import {
-  Grid,
-  Flex,
-} from '@chakra-ui/react';
+import { Grid, Flex } from '@chakra-ui/react';
 
 // hooks
 import { useCrosswordsManager } from '@/lib/pages/home/hooks/useCrosswordsManager';
@@ -19,7 +16,8 @@ import { EmptyState } from '@/lib/pages/home/components/emptyState';
 
 export const Dashboard = () => {
   const router = useRouter();
-  const { crosswords, isClient, searchQuery, setSearchQuery } = useCrosswordsManager();
+  const { crosswords, isClient, searchQuery, setSearchQuery } =
+    useCrosswordsManager();
 
   if (!isClient) {
     return <LoadingState />;
@@ -44,7 +42,7 @@ export const Dashboard = () => {
         gap={25}
       >
         <NewCrosswordCard router={router} />
-        
+
         {crosswords.length > 0 ? (
           crosswords.map(crossword => (
             <CrosswordCard key={crossword.id} crossword={crossword} />
